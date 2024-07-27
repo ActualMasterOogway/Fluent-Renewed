@@ -49,6 +49,10 @@ function Element:New(Idx, Config)
 		Input.Value = Text
 		Box.Text = Text
 
+		if Config.Flag then
+			Library.Flags[Config.Flag] = Input.Value
+		end
+
 		Library:SafeCallback(Input.Callback, Input.Value)
 		Library:SafeCallback(Input.Changed, Input.Value)
 	end

@@ -142,6 +142,12 @@ function Element:New(Idx, Config)
 		local OldValue = self.Value or Value
 
 		self.Value = Library.Utilities:Round(math.clamp(Value, Slider.Min, Slider.Max), Slider.Rounding)
+
+		if Config.Flag then
+			Library.Flags[Config.Flag] = Slider.Value
+		end
+
+
 		SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), -7, 0.5, 0)
 		SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 		SliderDisplay.Text = tostring(self.Value)
@@ -156,7 +162,6 @@ function Element:New(Idx, Config)
 	end
 
 	Slider:SetValue(typeof(Config.Default) == "number" and Config.Default or Slider.Min)
-
 	Library.Options[Idx] = Slider
 
 	return setmetatable(Slider, {

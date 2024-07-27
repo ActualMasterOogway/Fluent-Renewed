@@ -104,6 +104,10 @@ function Element:New(Idx, Config)
 		Key = Key or Keybind.Key
 		Mode = Mode or Keybind.Mode
 
+		if Config.Flag then
+			Library.Flags[Config.Flag] = Keybind.Value
+		end
+
 		Keybind.Value = Key
 		Keybind.Mode = Mode
 

@@ -479,12 +479,22 @@ function Element:New(Idx, Config)
 
 		Colorpicker.Transparency = Transparency or 0
 		Colorpicker:SetHSVFromRGB(Color)
+
+		if Config.Flag then
+			Library.Flags[Config.Flag] = Color
+		end
+
 		Colorpicker:Display()
 	end
 
 	function Colorpicker:SetValueRGB(Color, Transparency)
 		Colorpicker.Transparency = Transparency or 0
 		Colorpicker:SetHSVFromRGB(Color)
+
+		if Config.Flag then
+			Library.Flags[Config.Flag] = Color
+		end
+
 		Colorpicker:Display()
 	end
 

@@ -106,6 +106,8 @@ NotificationModule:Init(GUI)
 local Library = {
 	Version = "1.0.2",
 
+	Flags = {},
+
 	OpenFrames = {},
 	Options = {},
 	Themes = Themes.Names,

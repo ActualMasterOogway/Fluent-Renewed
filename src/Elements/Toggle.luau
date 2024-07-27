@@ -69,6 +69,10 @@ function Element:New(Idx, Config)
 		Value = not not Value
 		Toggle.Value = Value
 
+		if Config.Flag then
+			Library.Flags[Config.Flag] = Toggle.Value
+		end
+
 		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Accent" or "ToggleSlider" })
 		Creator.OverrideTag(ToggleCircle, { ImageColor3 = Toggle.Value and "ToggleToggled" or "ToggleSlider" })
 		ToggleCircle:TweenPosition(

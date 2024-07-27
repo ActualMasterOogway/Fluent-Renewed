@@ -466,6 +466,10 @@ function Element:New(Idx, Config)
 
 	function Colorpicker:Display()
 		Colorpicker.Value = Color3.fromHSV(Colorpicker.Hue, Colorpicker.Sat, Colorpicker.Vib)
+		if Config.Flag then
+			Library.Flags[Config.Flag] = Colorpicker.Value
+		end
+
 
 		DisplayFrameColor.BackgroundColor3 = Colorpicker.Value
 		DisplayFrameColor.BackgroundTransparency = Colorpicker.Transparency
@@ -480,20 +484,12 @@ function Element:New(Idx, Config)
 		Colorpicker.Transparency = Transparency or 0
 		Colorpicker:SetHSVFromRGB(Color)
 
-		if Config.Flag then
-			Library.Flags[Config.Flag] = Color
-		end
-
 		Colorpicker:Display()
 	end
 
 	function Colorpicker:SetValueRGB(Color, Transparency)
 		Colorpicker.Transparency = Transparency or 0
 		Colorpicker:SetHSVFromRGB(Color)
-
-		if Config.Flag then
-			Library.Flags[Config.Flag] = Color
-		end
 
 		Colorpicker:Display()
 	end

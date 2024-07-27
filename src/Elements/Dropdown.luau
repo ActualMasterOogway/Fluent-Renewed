@@ -392,6 +392,10 @@ function Element:New(Idx, Config)
 						Table:UpdateButton()
 						Dropdown:Display()
 
+						if Config.Flag then
+							Library.Flags[Config.Flag] = Dropdown.Value
+						end
+
 						Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
 						Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
 					end

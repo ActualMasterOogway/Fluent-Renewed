@@ -1,0 +1,45 @@
+name: Pushed
+
+on:
+  push:
+    paths:
+      - '**.luau'
+      - '**.lua'
+      - '**.rbxm'
+      - '**.json'
+  pull_request:
+    paths:
+      - '**.luau'
+      - '**.lua'
+      - '**.rbxm'
+      - '**.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build-script:
+    name: Bundle Hub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+
+      - name: Bundle
+        run: lune run Build
+
+      - name: Upload Minified Fluent to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fluent.luau
+          path: Distribution/Fluent.luau
+
+      - name: Upload Fluent Model to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fluent.rbxm
+          path: Distribution/Fluent.rbxm

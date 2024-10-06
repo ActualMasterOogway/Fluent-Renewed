@@ -329,9 +329,11 @@ function Element:New(Idx, Config)
 			Creator.AddThemeObject(Button, {
 				BackgroundColor3 = "DropdownOption"
 			})
+
 			Creator.AddThemeObject(ButtonSelector, {
 				BackgroundColor3 = "Accent",
 			})
+
 			Creator.AddThemeObject(ButtonLabel, {
 				TextColor3 = "Text"
 			})

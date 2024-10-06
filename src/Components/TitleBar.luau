@@ -161,7 +161,7 @@ return function(Config)
 	end)
 
 	TitleBar.MinButton = BarButton(Library.Utilities:GetIcon("Min"), UDim2.new(1, -80, 0, 4), TitleBar.Frame, 0, function()
-		Library.Window:Minimize()
+		Config.Window:Minimize()
 	end)
 
 	-- Searchbox would take alot of time

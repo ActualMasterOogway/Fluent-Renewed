@@ -302,20 +302,6 @@ return function(Config)
 		Window.TabHolder.CanvasSize = UDim2.new(0, 0, 0, Window.TabHolder.UIListLayout.AbsoluteContentSize.Y)
 	end)
 
-	Creator.AddSignal(UserInputService.InputBegan, function(Input)
-		if
-			type(Library.MinimizeKeybind) == "table"
-			and Library.MinimizeKeybind.Type == "Keybind"
-			and not UserInputService:GetFocusedTextBox()
-		then
-			if Input.KeyCode.Name == Library.MinimizeKeybind.Value then
-				Window:Minimize()
-			end
-		elseif Input.KeyCode == Library.MinimizeKey and not UserInputService:GetFocusedTextBox() then
-			Window:Minimize()
-		end
-	end)
-
 	function Window:Minimize()
 		Window.Minimized = not Window.Minimized
 		Window.Root.Visible = not Window.Minimized
@@ -331,6 +317,20 @@ return function(Config)
 			})
 		end
 	end
+
+	Creator.AddSignal(UserInputService.InputBegan, function(Input)
+		if
+			type(Library.MinimizeKeybind) == "table"
+			and Library.MinimizeKeybind.Type == "Keybind"
+			and not UserInputService:GetFocusedTextBox()
+		then
+			if Input.KeyCode.Name == Library.MinimizeKeybind.Value then
+				Window:Minimize()
+			end
+		elseif Input.KeyCode == Library.MinimizeKey and not UserInputService:GetFocusedTextBox() then
+			Window:Minimize()
+		end
+	end)
 
 	function Window:Destroy()
 		if require(Root).UseAcrylic then

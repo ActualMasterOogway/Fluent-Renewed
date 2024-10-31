@@ -124,7 +124,8 @@ function Element:New(Idx, Config)
 	function Slider:SetValue(Value)
 		local OldValue = self.Value or Value
 
-		self.Value = Library.Utilities:Round(math.clamp(Value, Slider.Min, Slider.Max), Slider.Rounding)
+		rawset(self, "Value", Library.Utilities:Round(math.clamp(Value, Slider.Min, Slider.Max), Slider.Rounding))
+
 		SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), -7, 0.5, 0)
 		SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 		SliderDisplay.Text = tostring(self.Value)

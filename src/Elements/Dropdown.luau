@@ -439,7 +439,7 @@ function Element:New(Idx, Config)
 
 	function Dropdown:SetValues(NewValues)
 		if NewValues then
-			Dropdown.Values = NewValues
+			rawset(Dropdown, "Values", NewValues)
 		end
 
 		Dropdown:BuildDropdownList()
@@ -460,12 +460,12 @@ function Element:New(Idx, Config)
 				end
 			end
 
-			Dropdown.Value = nTable
+			rawset(Dropdown, "Value", nTable)
 		else
 			if not Val then
-				Dropdown.Value = nil
+				rawset(Dropdown, "Value", nil)
 			elseif table.find(Dropdown.Values, Val) then
-				Dropdown.Value = Val
+				rawset(Dropdown, "Value", Val)
 			end
 		end
 
@@ -487,19 +487,19 @@ function Element:New(Idx, Config)
 
 	if type(Config.Default) == "table" then
 		for _, Value in next, Config.Default do
-			local Idx = table.find(Dropdown.Values, Value)
+			local Indx = table.find(Dropdown.Values, Value)
 
-			if Idx then
-				table.insert(Defaults, Idx)
+			if Indx then
+				table.insert(Defaults, Indx)
 			end
 		end
 		table.clear(Config.Default)
 	elseif type(Config.Default) == "number" and Dropdown.Values[Config.Default] ~= nil then
 		table.insert(Defaults, Config.Default)
 	else
-		local Idx = table.find(Dropdown.Values, Config.Default)
-		if Idx then
-			table.insert(Defaults, Idx)
+		local Indx = table.find(Dropdown.Values, Config.Default)
+		if Indx then
+			table.insert(Defaults, Indx)
 		end
 	end
 

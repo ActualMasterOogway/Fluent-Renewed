@@ -104,7 +104,7 @@ function Element:New(Idx, Config)
 		Key = Key or Keybind.Key
 		Mode = Mode or Keybind.Mode
 
-		Keybind.Value = Key
+		rawset(Keybind, "Value", Key)
 		Keybind.Mode = Mode
 
 		KeybindDisplayLabel.Text = Library.Utilities:Prettify(Keybind.Value)

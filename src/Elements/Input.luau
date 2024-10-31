@@ -46,7 +46,7 @@ function Element:New(Idx, Config)
 			end
 		end
 
-		Input.Value = Text
+		rawset(Input, "Value", Text)
 		Box.Text = Text
 
 		Library:SafeCallback(Input.Callback, Input.Value)

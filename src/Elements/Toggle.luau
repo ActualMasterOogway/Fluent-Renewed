@@ -67,7 +67,8 @@ function Element:New(Idx, Config)
 
 	function Toggle:SetValue(Value)
 		Value = not not Value
-		Toggle.Value = Value
+
+		rawset(Toggle, "Value", Value)
 
 		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Accent" or "ToggleSlider" })
 		Creator.OverrideTag(ToggleCircle, { ImageColor3 = Toggle.Value and "ToggleToggled" or "ToggleSlider" })

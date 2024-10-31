@@ -463,7 +463,7 @@ function Element:New(Idx, Config)
 	end
 
 	function Colorpicker:Display()
-		Colorpicker.Value = Color3.fromHSV(Colorpicker.Hue, Colorpicker.Sat, Colorpicker.Vib)
+		rawset(Colorpicker, "Value", Color3.fromHSV(Colorpicker.Hue, Colorpicker.Sat, Colorpicker.Vib))
 
 		DisplayFrameColor.BackgroundColor3 = Colorpicker.Value
 		DisplayFrameColor.BackgroundTransparency = Colorpicker.Transparency
@@ -475,13 +475,13 @@ function Element:New(Idx, Config)
 	function Colorpicker:SetValue(HSV, Transparency)
 		local Color = Color3.fromHSV(HSV[1], HSV[2], HSV[3])
 
-		Colorpicker.Transparency = Transparency or 0
+		rawset(Colorpicker, "Transparency", Transparency or 0)
 		Colorpicker:SetHSVFromRGB(Color)
 		Colorpicker:Display()
 	end
 
 	function Colorpicker:SetValueRGB(Color, Transparency)
-		Colorpicker.Transparency = Transparency or 0
+		rawset(Colorpicker, "Transparency", Transparency or 0)
 		Colorpicker:SetHSVFromRGB(Color)
 		Colorpicker:Display()
 	end

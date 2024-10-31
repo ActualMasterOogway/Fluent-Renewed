@@ -33,7 +33,7 @@ function Element:New(Idx, Config)
 
 	function Paragraph:SetValue(Value)
 		Value = Value or ""
-		Paragraph.Value = Value
+		rawset(Paragraph, "Value", Value)
 
 		ParagraphFrame:SetDesc(Value)
 

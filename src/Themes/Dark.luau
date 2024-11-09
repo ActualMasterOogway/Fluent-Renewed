@@ -1,5 +1,4 @@
 return {
-	Name = "Dark",
 	Accent = Color3.fromRGB(96, 205, 255),
 
 	AcrylicMain = Color3.fromRGB(60, 60, 60),

@@ -1,5 +1,4 @@
 return {
-	Name = "Vynixu",
 	Accent = Color3.fromRGB(90, 235, 45),
 
 	AcrylicMain = Color3.fromRGB(30, 30, 30),

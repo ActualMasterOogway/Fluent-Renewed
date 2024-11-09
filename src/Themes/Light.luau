@@ -1,5 +1,4 @@
 return {
-	Name = "Light",
 	Accent = Color3.fromRGB(0, 103, 192),
 
 	AcrylicMain = Color3.fromRGB(200, 200, 200),
@@ -40,7 +39,7 @@ return {
 	DialogInput = Color3.fromRGB(250, 250, 250),
 	DialogInputLine = Color3.fromRGB(160, 160, 160),
 
-	Text = Color3.fromRGB(0, 0, 0),
+	Text = Color3.fromRGB(41, 41, 41),
 	SubText = Color3.fromRGB(40, 40, 40),
 	Hover = Color3.fromRGB(50, 50, 50),
 	HoverChange = 0.16

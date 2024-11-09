@@ -1,19 +1,34 @@
 local Themes = {
 	Names = {
-		"Dark",
-		"Darker",
 		"Vynixu",
-		"Light",
+		"Dark",
+		--"VSC Dark High Contrast",
+		"Darker",
 		"Aqua",
 		"Amethyst",
-		"Rose"
+		"Rose",
+		"Typewriter",
+        "Dark Typewriter",
+		"Light",
+		"VSC Light High Contrast",
+		"GitHub Dark",
+		"GitHub Dark Dimmed",
+		"GitHub Dark Default",
+		"GitHub Dark High Contrast",
+		"GitHub Dark Colorblind",
+		"GitHub Light",
+		"GitHub Light Default",
+		"GitHub Light High Contrast",
+		"GitHub Light Colorblind"
 	}
 }
 
-for _, Theme in next, script:GetChildren() do
-	local Required = require(Theme)
+for _, Theme in next, Themes.Names do
+	local ThemeData = require(script[Theme])
 
-	Themes[Required.Name] = Required
+	ThemeData.Name = Theme
+
+	Themes[ThemeData.Name] = ThemeData
 end
 
 return Themes

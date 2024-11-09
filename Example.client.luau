@@ -186,6 +186,18 @@ local Input = Tabs.Main:Input("Input", {
         print("Input changed:", Value)
     end
 })
+
+local InputLostFocus = Tabs.Main:Input("InputFocusLost", {
+    Title = "Input",
+    Default = "Default",
+    ClearOnFocusLost = true, -- Only availible when Finished == true
+    Numeric = false,
+    Finished = true,
+    Placeholder = "Placeholder text",
+    Callback = function(Value)
+        print("Input changed:", Value)
+    end
+})
     
 Toggle:OnChanged(function()
     print("Toggle changed:", Main.Options["Toggle"].Value)

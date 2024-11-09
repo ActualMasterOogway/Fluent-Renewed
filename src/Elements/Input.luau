@@ -18,6 +18,7 @@ function Element:New(Idx, Config)
 		Numeric = Config.Numeric or false,
 		Finished = Config.Finished or false,
 		Callback = Config.Callback or function(Value) end,
+		ClearOnFocusLost = Config.ClearOnFocusLost or false,
 		Type = "Input",
 	}
 
@@ -54,11 +55,16 @@ function Element:New(Idx, Config)
 	end
 
 	if Input.Finished then
-		AddSignal(Box.FocusLost, function(enter)
+		AddSignal(Box.FocusLost, function(enter: boolean, input: InputObject)
 			if not enter then
 				return
 			end
+
 			Input:SetValue(Box.Text)
+
+			if Config.ClearOnFocusLost then
+				Box.Text = ""
+			end
 		end)
 	else
 		AddSignal(Box:GetPropertyChangedSignal("Text"), function()

@@ -521,6 +521,8 @@ function Element:New(Idx, Config)
 
 	Library.Options[Idx] = Dropdown
 
+	Dropdown.Instance = DropdownFrame
+
 	return setmetatable(Dropdown, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then

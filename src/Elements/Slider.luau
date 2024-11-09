@@ -161,6 +161,8 @@ function Element:New(Idx, Config)
 
 	Library.Options[Idx] = Slider
 
+	Slider.Instance = SliderFrame
+
 	return setmetatable(Slider, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then

@@ -504,6 +504,8 @@ function Element:New(Idx, Config)
 
 	Library.Options[Idx] = Colorpicker
 
+	Colorpicker.Instance = ColorpickerFrame
+
 	return setmetatable(Colorpicker, {
 		__newindex =  function(self, index, newvalue)
 			local NewValue_Type = typeof(newvalue)

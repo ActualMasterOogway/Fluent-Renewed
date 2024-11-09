@@ -101,6 +101,9 @@ function Element:New(Idx, Config)
 	Toggle:SetValue(Toggle.Value)
 
 	Library.Options[Idx] = Toggle
+
+	Toggle.Instance = ToggleFrame
+
 	return setmetatable(Toggle, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then

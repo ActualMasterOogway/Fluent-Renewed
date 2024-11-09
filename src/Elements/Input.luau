@@ -84,6 +84,8 @@ function Element:New(Idx, Config)
 
 	Library.Options[Idx] = Input
 
+	Input.Instance = InputFrame
+
 	return setmetatable(Input, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then

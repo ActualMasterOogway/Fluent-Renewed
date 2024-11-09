@@ -195,6 +195,8 @@ function Element:New(Idx, Config)
 
 	Library.Options[Idx] = Keybind
 
+	Keybind.Instance = KeybindFrame
+
 	return setmetatable(Keybind, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then

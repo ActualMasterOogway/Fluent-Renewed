@@ -52,6 +52,9 @@ function Element:New(Idx, Config)
 	Paragraph:SetValue(Paragraph.Value)
 
 	Library.Options[Idx] = Paragraph
+
+	Paragraph.Instance = ParagraphFrame
+
 	return setmetatable(Paragraph, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then

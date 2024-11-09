@@ -198,7 +198,7 @@ local InputLostFocus = Tabs.Main:Input("InputFocusLost", {
         print("Input changed:", Value)
     end
 })
-    
+
 Toggle:OnChanged(function()
     print("Toggle changed:", Main.Options["Toggle"].Value)
 end)

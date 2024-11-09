@@ -18,7 +18,7 @@ function Element:New(Idx, Config)
 		Min = typeof(Config.Min) == "number" and Config.Min or 0,
 		Max = Config.Max,
 		Rounding = typeof(Config.Rounding) == "number" and Config.Rounding or 0,
-		Callback = typeof(Config.Min) == "function" and Config.Callback or function(Value, OldValue) end,
+		Callback = typeof(Config.Callback) == "function" and Config.Callback or function(Value, OldValue) end,
 		Changed = Config.Changed or function() end,
 		Type = "Slider"
 	}

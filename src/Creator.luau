@@ -150,7 +150,7 @@ end
 
 function Creator.OverrideTag(Object, Properties)
 	Creator.Registry[Object].Properties = Properties
-	Creator.UpdateTheme()
+	Creator.UpdateTheme(Object)
 end
 
 function Creator.New(Name, Properties, Children)

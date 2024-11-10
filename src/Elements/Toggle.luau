@@ -72,17 +72,20 @@ function Element:New(Idx, Config)
 
 		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Accent" or "ToggleSlider" })
 		Creator.OverrideTag(ToggleCircle, { ImageColor3 = Toggle.Value and "ToggleToggled" or "ToggleSlider" })
+
 		ToggleCircle:TweenPosition(
 			UDim2.new(0, Toggle.Value and 19 or 2, 0.5, 0),
 			Enum.EasingDirection.Out,
 			Enum.EasingStyle.Quint,
 			.25
 		)
+
 		TweenService:Create(
 			ToggleSlider,
 			TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
 			{ BackgroundTransparency = Toggle.Value and 0 or 1 }
 		):Play()
+
 		ToggleCircle.ImageTransparency = Toggle.Value and 0 or 0.5
 
 		Library:SafeCallback(Toggle.Callback, Toggle.Value)

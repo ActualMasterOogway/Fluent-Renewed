@@ -271,6 +271,20 @@ Tabs.Main:Button{
     end
 }
 
+Tabs.Main:Button{
+    Title = "Set Dropdown Values",
+    Description = "",
+    Callback = function()
+        local Values = {}
+
+        for i = 1, 1 do
+            Values[i] = math.random(i, i^2)
+        end
+
+        Dropdown:SetValues(Values)
+    end
+}
+
 task.spawn(function()
     while true do
         wait(1)

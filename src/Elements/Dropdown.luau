@@ -231,6 +231,26 @@ function Element:New(Idx, Config)
 
 	Creator.AddSignal(DropdownInner:GetPropertyChangedSignal("AbsolutePosition"), RecalculateListPosition)
 
+	local ScrollFrame = self.ScrollFrame
+	function Dropdown:Open()
+		Dropdown.Opened = true
+		ScrollFrame.ScrollingEnabled = false
+		DropdownHolderCanvas.Visible = true
+		DropdownHolderFrame:TweenSize(
+			UDim2.fromScale(1, 1),
+			Enum.EasingDirection.Out,
+			Enum.EasingStyle.Quart,
+			.2
+		)
+	end
+
+	function Dropdown:Close()
+		Dropdown.Opened = false
+		ScrollFrame.ScrollingEnabled = true
+		DropdownHolderFrame.Size = UDim2.fromScale(1, 0.6)
+		DropdownHolderCanvas.Visible = false
+	end
+
 	Creator.AddSignal(DropdownInner.MouseButton1Click, function()
 		Dropdown:Open()
 	end)
@@ -251,26 +271,6 @@ function Element:New(Idx, Config)
 			end
 		end
 	end)
-
-	local ScrollFrame = self.ScrollFrame
-	function Dropdown:Open()
-		Dropdown.Opened = true
-		ScrollFrame.ScrollingEnabled = false
-		DropdownHolderCanvas.Visible = true
-		DropdownHolderFrame:TweenSize(
-			UDim2.fromScale(1, 1),
-			Enum.EasingDirection.Out,
-			Enum.EasingStyle.Quart,
-			.2
-		)
-	end
-
-	function Dropdown:Close()
-		Dropdown.Opened = false
-		ScrollFrame.ScrollingEnabled = true
-		DropdownHolderFrame.Size = UDim2.fromScale(1, 0.6)
-		DropdownHolderCanvas.Visible = false
-	end
 
 	function Dropdown:Display()
 		local Values = Dropdown.Values
@@ -320,11 +320,14 @@ function Element:New(Idx, Config)
 			local Table = {}
 			local Selected
 
-			Count = Count + 1
+			Count += 1
 
 			local Button = Button_BuildList:Clone()
-
 			local ButtonSelector, ButtonLabel = Button.Frame, Button.ButtonLabel
+
+			-- AddThemeObject causes some small stuttering, the reason for that is because of 'Creator.UpdateTheme'
+			-- which is called every single time a dropdown is (re)built.
+			-- I have no idea how to optimize this so suggestions are welcome.
 
 			Creator.AddThemeObject(Button, {
 				BackgroundColor3 = "DropdownOption"
@@ -355,12 +358,15 @@ function Element:New(Idx, Config)
 			Creator.AddSignal(Button.MouseEnter, function()
 				SetBackTransparency(Selected and 0.85 or 0.89)
 			end)
+
 			Creator.AddSignal(Button.MouseLeave, function()
 				SetBackTransparency(Selected and 0.89 or 1)
 			end)
+
 			Creator.AddSignal(Button.MouseButton1Down, function()
 				SetBackTransparency(0.92)
 			end)
+
 			Creator.AddSignal(Button.MouseButton1Up, function()
 				SetBackTransparency(Selected and 0.85 or 0.89)
 			end)
@@ -424,6 +430,7 @@ function Element:New(Idx, Config)
 		end
 
 		ListSizeX = 0
+
 		for Button, Table in next, Buttons do
 			if Button.ButtonLabel then
 				if Button.ButtonLabel.TextBounds.X > ListSizeX then
@@ -431,6 +438,7 @@ function Element:New(Idx, Config)
 				end
 			end
 		end
+
 		ListSizeX = ListSizeX + 30
 
 		RecalculateCanvasSize()

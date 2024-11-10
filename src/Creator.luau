@@ -88,15 +88,22 @@ function Creator.GetThemeProperty(Property)
 	if Themes[require(Root).Theme][Property] then
 		return Themes[require(Root).Theme][Property]
 	end
+
 	return Themes["Dark"][Property]
 end
 
-function Creator.UpdateTheme()
-	for Instance, Object in next, Creator.Registry do
-		for Property, ColorIdx in next, Object.Properties do
-			Instance[Property] = Creator.GetThemeProperty(ColorIdx)
+function Creator.UpdateTheme(RegistryIndex: Instance?)
+	if typeof(RegistryIndex) == "Instance" and Creator.Registry[RegistryIndex] then
+		for Property, ColorIdx in next, Creator.Registry[RegistryIndex].Properties do
+			RegistryIndex[Property] = Creator.GetThemeProperty(ColorIdx)
 		end
-	end
+	else
+		for _, Object in next, Creator.Registry do
+			for Property, ColorIdx in next, Object.Properties do
+				Object.Object[Property] = Creator.GetThemeProperty(ColorIdx)
+			end
+		end
+	end	
 
 	for _, Motor in next, Creator.TransparencyMotors do
 		Motor:setGoal(Flipper.Instant.new(Creator.GetThemeProperty("ElementTransparency")))
@@ -112,7 +119,8 @@ function Creator.AddThemeObject(Object, Properties)
 	}
 
 	Creator.Registry[Object] = Data
-	Creator.UpdateTheme()
+	Creator.UpdateTheme(Object)
+
 	return Object
 end
 

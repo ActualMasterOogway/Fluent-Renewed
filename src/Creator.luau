@@ -64,6 +64,10 @@ local Creator = {
 			BorderColor3 = Color3.new(0, 0, 0),
 			BorderSizePixel = 0,
 		}
+	},
+	Theme = {
+		Updating = false,
+		Updated = Flipper.Signal.new(),
 	}
 }
 
@@ -93,6 +97,12 @@ function Creator.GetThemeProperty(Property)
 end
 
 function Creator.UpdateTheme(RegistryIndex: Instance?)
+	if Creator.Theme.Updating then
+		Creator.Theme.Updated:Wait()
+	end
+
+	Creator.Theme.Updating = true
+
 	local Count = 0
 
 	if typeof(RegistryIndex) == "Instance" and Creator.Registry[RegistryIndex] then
@@ -132,6 +142,9 @@ function Creator.UpdateTheme(RegistryIndex: Instance?)
 
 		Motor:setGoal(Flipper.Instant.new(Creator.GetThemeProperty("ElementTransparency")))
 	end
+
+	Creator.Theme.Updating = false
+	Creator.Theme.Updated:Fire()
 end
 
 function Creator.AddThemeObject(Object, Properties)

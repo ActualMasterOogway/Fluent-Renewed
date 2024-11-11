@@ -26,8 +26,15 @@ jobs:
         with:
           submodules: true
 
-      - name: Setup Aftman
-        uses: ok-nick/setup-aftman@v0.4.2
+      - name: Setup RoKit
+        uses: CompeyDev/setup-rokit@v0.1.2
+
+      - name: Install Necessary Tools
+        run: |
+          rokit trust rojo-rbx/rojo
+          rokit trust lune-org/lune
+          rokit trust seaofvoices/darklua
+          rokit install
 
       - name: Bundle
         run: lune run Build

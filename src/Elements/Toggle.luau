@@ -77,7 +77,8 @@ function Element:New(Idx, Config)
 			UDim2.new(0, Toggle.Value and 19 or 2, 0.5, 0),
 			Enum.EasingDirection.Out,
 			Enum.EasingStyle.Quint,
-			.25
+			.25,
+			true
 		)
 
 		TweenService:Create(

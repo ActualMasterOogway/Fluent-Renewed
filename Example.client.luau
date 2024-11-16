@@ -312,8 +312,6 @@ ToggleKeybind:Keybind("KeybindInToggle", {
 
 ToggleKeybind.Keybind:SetValue("A")
 
-print(ToggleKeybind.Keybind.Instance)
-
 task.spawn(function()
     while true do
         wait(1)

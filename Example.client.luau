@@ -167,6 +167,14 @@ local TColorpicker = Tabs.Main:Colorpicker("TransparencyColorpicker", {
     Default = Color3.fromRGB(96, 205, 255)
 })
 
+local CColorpicker = Tabs.Main:Colorpicker("ChangeColorpicker", {
+    Title = "Colorpicker",
+    Description = "but it updates while you slide.",
+    Transparency = 0,
+    Default = Color3.fromRGB(96, 205, 255),
+    UpdateOnChange = true
+})
+
 local Keybind = Tabs.Main:Keybind("Keybind", {
     Title = "KeyBind",
     Mode = "Hold",
@@ -249,6 +257,13 @@ TColorpicker:OnChanged(function()
     print(
         "TColorpicker changed:", TColorpicker.Value,
         "Transparency:", TColorpicker.Transparency
+    )
+end)
+
+CColorpicker:OnChanged(function()
+    print(
+        "CColorpicker changed:", CColorpicker.Value,
+        "Transparency:", CColorpicker.Transparency
     )
 end)
 

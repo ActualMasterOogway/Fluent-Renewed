@@ -24,6 +24,7 @@ function Element:New(Idx, Config)
 	local Colorpicker = {
 		Value = Config.Default,
 		Transparency = Config.Transparency or 0,
+		UpdateOnChange = Config.UpdateOnChange or Config.UpdateWhileSliding or false,
 		Type = "Colorpicker",
 		Title = type(Config.Title) == "string" and Config.Title or "Colorpicker",
 		Callback = Config.Callback or function(Color) end,
@@ -76,6 +77,8 @@ function Element:New(Idx, Config)
 
 		local Hue, Sat, Vib = Colorpicker.Hue, Colorpicker.Sat, Colorpicker.Vib
 		local Transparency = Colorpicker.Transparency
+
+		local OrigHue, OrigSat, OrigVib, OrigTransparency = Colorpicker.Hue, Colorpicker.Sat, Colorpicker.Vib, Colorpicker.Transparency
 
 		local function CreateInput()
 			local Box = require(Components.Textbox)()
@@ -330,6 +333,10 @@ function Element:New(Idx, Config)
 				TransparencyDrag.Position = UDim2.new(0, -1, 1 - Transparency, -6)
 				AlphaInput.Input.Text = `{Library.Utilities:Round((1 - Transparency) * 100, 0)}%`
 			end
+
+			if Colorpicker.UpdateOnChange then
+				Colorpicker:SetValue({ Hue, Sat, Vib }, Transparency)
+			end
 		end
 
 		Creator.AddSignal(HexInput.Input.FocusLost, function(Enter)
@@ -395,59 +402,96 @@ function Element:New(Idx, Config)
 			end)
 		end
 
+		local function UpdateSatVib()
+			local MinX = SatVibMap.AbsolutePosition.X
+			local MaxX = MinX + SatVibMap.AbsoluteSize.X
+			local MouseX = math.clamp(Mouse.X, MinX, MaxX)
+
+			local MinY = SatVibMap.AbsolutePosition.Y
+			local MaxY = MinY + SatVibMap.AbsoluteSize.Y
+			local MouseY = math.clamp(Mouse.Y, MinY, MaxY)
+
+			Sat = (MouseX - MinX) / (MaxX - MinX)
+			Vib = 1 - ((MouseY - MinY) / (MaxY - MinY))
+			Display()
+		end
+
+		local function UpdateHue()
+			local MinY = HueSlider.AbsolutePosition.Y
+			local MaxY = MinY + HueSlider.AbsoluteSize.Y
+			local MouseY = math.clamp(Mouse.Y, MinY, MaxY)
+
+			Hue = ((MouseY - MinY) / (MaxY - MinY))
+			Display()
+		end
+
+		local function UpdateTransparency()
+			local MinY = TransparencySlider.AbsolutePosition.Y
+			local MaxY = MinY + TransparencySlider.AbsoluteSize.Y
+			local MouseY = math.clamp(Mouse.Y, MinY, MaxY)
+
+			Transparency = 1 - ((MouseY - MinY) / (MaxY - MinY))
+			Display()
+		end
+
+		local MouseMoveConnection
 		Creator.AddSignal(SatVibMap.InputBegan, function(Input)
-			if
-				Input.UserInputType == Enum.UserInputType.MouseButton1
-				or Input.UserInputType == Enum.UserInputType.Touch
-			then
-				while UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-					local MinX = SatVibMap.AbsolutePosition.X
-					local MaxX = MinX + SatVibMap.AbsoluteSize.X
-					local MouseX = math.clamp(Mouse.X, MinX, MaxX)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 
+				or Input.UserInputType == Enum.UserInputType.Touch then
+				
+				MouseMoveConnection = Mouse.Move:Connect(UpdateSatVib)
+				UpdateSatVib()
+			end
+		end)
 
-					local MinY = SatVibMap.AbsolutePosition.Y
-					local MaxY = MinY + SatVibMap.AbsoluteSize.Y
-					local MouseY = math.clamp(Mouse.Y, MinY, MaxY)
-
-					Sat = (MouseX - MinX) / (MaxX - MinX)
-					Vib = 1 - ((MouseY - MinY) / (MaxY - MinY))
-					Display()
-
-					RenderStepped:Wait()
+		Creator.AddSignal(SatVibMap.InputEnded, function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1
+				or Input.UserInputType == Enum.UserInputType.Touch then
+				
+				if MouseMoveConnection then
+					MouseMoveConnection:Disconnect()
+					MouseMoveConnection = nil
 				end
 			end
 		end)
 
 		Creator.AddSignal(HueSlider.InputBegan, function(Input)
-			if
-				Input.UserInputType == Enum.UserInputType.MouseButton1
-				or Input.UserInputType == Enum.UserInputType.Touch
-			then
-				while UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-					local MinY = HueSlider.AbsolutePosition.Y
-					local MaxY = MinY + HueSlider.AbsoluteSize.Y
-					local MouseY = math.clamp(Mouse.Y, MinY, MaxY)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1
+				or Input.UserInputType == Enum.UserInputType.Touch then
+				
+				MouseMoveConnection = Mouse.Move:Connect(UpdateHue)
+				UpdateHue()
+			end
+		end)
 
-					Hue = ((MouseY - MinY) / (MaxY - MinY))
-					Display()
-
-					RenderStepped:Wait()
+		Creator.AddSignal(HueSlider.InputEnded, function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1
+				or Input.UserInputType == Enum.UserInputType.Touch then
+				
+				if MouseMoveConnection then
+					MouseMoveConnection:Disconnect()
+					MouseMoveConnection = nil
 				end
 			end
 		end)
 
 		if Config.Transparency then
 			Creator.AddSignal(TransparencySlider.InputBegan, function(Input)
-				if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-					while UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-						local MinY = TransparencySlider.AbsolutePosition.Y
-						local MaxY = MinY + TransparencySlider.AbsoluteSize.Y
-						local MouseY = math.clamp(Mouse.Y, MinY, MaxY)
+				if Input.UserInputType == Enum.UserInputType.MouseButton1
+					or Input.UserInputType == Enum.UserInputType.Touch then
+					
+					MouseMoveConnection = Mouse.Move:Connect(UpdateTransparency)
+					UpdateTransparency()
+				end
+			end)
 
-						Transparency = 1 - ((MouseY - MinY) / (MaxY - MinY))
-						Display()
-
-						RenderStepped:Wait()
+			Creator.AddSignal(TransparencySlider.InputEnded, function(Input)
+				if Input.UserInputType == Enum.UserInputType.MouseButton1
+					or Input.UserInputType == Enum.UserInputType.Touch then
+					
+					if MouseMoveConnection then
+						MouseMoveConnection:Disconnect()
+						MouseMoveConnection = nil
 					end
 				end
 			end)
@@ -458,7 +502,11 @@ function Element:New(Idx, Config)
 		Dialog:Button("Done", function()
 			Colorpicker:SetValue({ Hue, Sat, Vib }, Transparency)
 		end)
-		Dialog:Button("Cancel")
+
+		Dialog:Button("Cancel", function()
+			Colorpicker:SetValue({ OrigHue, OrigSat, OrigVib }, OrigTransparency)
+		end)
+
 		Dialog:Open()
 	end
 

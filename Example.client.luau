@@ -285,6 +285,20 @@ Tabs.Main:Button{
     end
 }
 
+local ToggleKeybind = Tabs.Main:Toggle("ToggleWithKeybind", {
+    Title = "Toggle",
+    Default = false
+})
+
+ToggleKeybind:Keybind("KeybindInToggle", {
+    Title = "Keybind",
+    Default = "Unknown"
+})
+
+ToggleKeybind.Keybind:SetValue("A")
+
+print(ToggleKeybind.Keybind.Instance)
+
 task.spawn(function()
     while true do
         wait(1)

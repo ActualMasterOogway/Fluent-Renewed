@@ -468,8 +468,8 @@ function Element:New(Idx, Config)
 		DisplayFrameColor.BackgroundColor3 = Colorpicker.Value
 		DisplayFrameColor.BackgroundTransparency = Colorpicker.Transparency
 
-		Element.Library:SafeCallback(Colorpicker.Callback, Colorpicker.Value)
-		Element.Library:SafeCallback(Colorpicker.Changed, Colorpicker.Value)
+		Library:SafeCallback(Colorpicker.Callback, Colorpicker.Value)
+		Library:SafeCallback(Colorpicker.Changed, Colorpicker.Value)
 	end
 
 	function Colorpicker:SetValue(HSV, Transparency)
@@ -509,9 +509,12 @@ function Element:New(Idx, Config)
 	return setmetatable(Colorpicker, {
 		__newindex =  function(self, index, newvalue)
 			local NewValue_Type = typeof(newvalue)
-
 			if index == "Value" then
-				return Colorpicker[NewValue_Type == "table" and "SetValue" or "SetValueRGB"](Colorpicker, newvalue)
+				if NewValue_Type == "table" then
+					return Colorpicker:SetValue(newvalue)
+				else
+					return Colorpicker:SetValueRGB(newvalue)
+				end
 			elseif index == "Transparency" and NewValue_Type == "number" then
 				return Colorpicker:SetValueRGB(Colorpicker.Value, newvalue)
 			end

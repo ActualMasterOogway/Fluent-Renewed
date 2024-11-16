@@ -101,7 +101,7 @@ function Element:New(Idx, Config)
 	end
 
 	function Keybind:SetValue(Key, Mode)
-		Key = Key or Keybind.Key
+		Key = Key or Keybind.Value
 		Mode = Mode or Keybind.Mode
 
 		rawset(Keybind, "Value", Key)

@@ -51,6 +51,7 @@ local ElementsTable = require(Root.Elements)
 local Acrylic = require(Root.Acrylic)
 local Icons = require(Root.Icons)
 local Themes = require(Root.Themes)
+local Signal = require(Root.Packages.Flipper.Signal)
 
 local NotificationModule = require(Components.Notification)
 
@@ -110,13 +111,15 @@ local Library = {
 	Options = {},
 	Themes = Themes.Names,
 
-	OnUnload = nil,
-	PostUnload = nil,
+	OnUnload = Signal.new(),
+	PostUnload = Signal.new(),
+	ThemeChanged = Signal.new(),
 	CreatedWindow = nil,
 	WindowFrame = nil,
 	Utilities = {
 		Themes = Themes,
-		Shared = SharedTable
+		Shared = SharedTable,
+		Creator = Creator
 	},
 	Connections = Creator.Signals,
 	Unloaded = false,
@@ -265,6 +268,7 @@ function Library:SetTheme(Name: string)
 	if Library.CreatedWindow and table.find(Library.Themes, Name) then
 		Library.Theme = Name
 		Creator.UpdateTheme()
+		Library.ThemeChanged:Fire(Name)
 	end
 end
 
@@ -273,9 +277,7 @@ function Library:Destroy()
 		Library.Unloaded = true
 		Library.Loaded = false
 
-		if typeof(Library.OnUnload) == "function" then
-			Library:SafeCallback(Library.OnUnload, tick())
-		end
+		Library.OnUnload:Fire(tick())
 
 		if Library.UseAcrylic then
 			Library.CreatedWindow.AcrylicPaint.Model:Destroy()
@@ -337,9 +339,7 @@ function Library:Destroy()
 		task.delay(info.Time, function()
 			Library.GUI:Destroy()
 
-			if typeof(Library.PostUnload) == "function" then
-				Library:SafeCallback(Library.PostUnload, tick())
-			end
+			Library.PostUnload:Fire(tick())
 		end)
 	end
 end

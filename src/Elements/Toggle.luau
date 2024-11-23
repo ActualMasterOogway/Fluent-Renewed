@@ -102,19 +102,29 @@ function Element:New(Idx, Config)
 		Toggle:SetValue(not Toggle.Value)
 	end)
 
-	Toggle.Keybind = setmetatable({}, {
+	Toggle.Keybind = setmetatable({}, { -- TODO: Rewrite this piece of shit
 		__call = function(_, self, Idx, Config)
-			local Keybind = {
-				Value = Config.Default or Config.Value or Enum.KeyCode.Unknown,
-				Toggled = false,
-				Mode = Config.Mode or "Toggle",
-				Type = "Keybind",
-				Callback = Config.Callback or function(Value) end,
-				ChangedCallback = Config.ChangedCallback or function(New) end,
-			}
-	
+			local KeybindProxy = newproxy(true)
+			local Keybind = getmetatable(KeybindProxy)
+			
+			Keybind.Value = Config.Default or Config.Value or Enum.KeyCode.Unknown
+			Keybind.Toggled = false
+			Keybind.Mode = Config.Mode or "Toggle"
+			Keybind.Type = "Keybind"
+			Keybind.Callback = Config.Callback or function(Value) end
+			Keybind.ChangedCallback = Config.ChangedCallback or function(New) end
+
+			Keybind.__newindex = function(self, index, newvalue)
+				if index == "Value" then
+					return Keybind:SetValue(newvalue)
+				end
+				return rawset(self, index, newvalue)
+			end
+
+			Keybind.__metatable = "The metatable is locked"
+
 			local Picking = false
-	
+
 			local KeybindDisplayLabel = New("TextLabel", {
 				FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
 				Text = Library.Utilities:Prettify(Keybind.Value),
@@ -194,7 +204,7 @@ function Element:New(Idx, Config)
 				Key = Key or Keybind.Value
 				Mode = Mode or Keybind.Mode
 		
-				rawset(Keybind, "Value", Key)
+				Keybind.Value = Key
 				Keybind.Mode = Mode
 		
 				KeybindDisplayLabel.Text = Library.Utilities:Prettify(Keybind.Value)
@@ -252,9 +262,7 @@ function Element:New(Idx, Config)
 							then
 								Picking = false
 		
-								Keybind.Value = Key
-		
-								KeybindDisplayLabel.Text = Library.Utilities:Prettify(Keybind.Value)
+								Keybind:SetValue(Key)
 		
 								Library:SafeCallback(Keybind.ChangedCallback, Input.KeyCode or Input.UserInputType)
 								Library:SafeCallback(Keybind.Changed, Input.KeyCode or Input.UserInputType)
@@ -288,20 +296,12 @@ function Element:New(Idx, Config)
 			end)
 	
 			Creator.AddSignal(KeybindDisplayFrame:GetPropertyChangedSignal("AbsoluteSize"), UpdateTogglePosition)
-		
-			Library.Options[Idx] = Keybind
+
+			Library.Options[Idx] = KeybindProxy
 
 			Keybind.Instance = KeybindDisplayFrame
-	
-			Toggle.Keybind = setmetatable(Keybind, {
-				__newindex =  function(self, index, newvalue)
-					if index == "Value" then
-						Keybind:SetValue(newvalue)
-					end
-	
-					return rawset(self, index, newvalue)
-				end
-			})
+
+			Toggle.Keybind = KeybindProxy
 	
 			return Toggle.Keybind
 		end

@@ -4,6 +4,7 @@ local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
 local Acrylic = require(Root.Acrylic)
+local Signal = require(Root.Packages.Flipper.Signal)
 local Assets = require(script.Parent.Assets)
 local Components = script.Parent
 
@@ -20,7 +21,11 @@ local New = Creator.New
 return function(Config)
 	local Window = {
 		Minimized = false,
+		OnMinimized = Signal.new(),
+		PostMinimized = Signal.new(),
 		Maximized = false,
+		OnMaximized = Signal.new(),
+		PostMaximized = Signal.new(),
 		Size = Config.Size,
 		MinSize = Config.MinSize,
 		CurrentPos = 0,
@@ -193,6 +198,8 @@ return function(Config)
 	local OldSizeX
 	local OldSizeY
 	Window.Maximize = function(Value, NoPos, Instant)
+		Window.OnMaximized:Fire(tick())
+
 		Window.Maximized = Value
 		Window.TitleBar.MaxButton.Frame.Icon.Image = Value and Assets.Restore or Assets.Max
 
@@ -214,6 +221,8 @@ return function(Config)
 				Y = Spring(Value and 0 or Window.Position.Y.Offset, { frequency = 6 }),
 			})
 		end
+
+		Window.PostMaximized:Fire(tick())
 	end
 
 	Creator.AddSignal(Window.TitleBar.Frame.InputBegan, function(Input)
@@ -305,6 +314,9 @@ return function(Config)
 	function Window:Minimize()
 		Window.Minimized = not Window.Minimized
 		Window.Root.Visible = not Window.Minimized
+
+		Window.OnMinimized:Fire(tick())
+
 		if not MinimizeNotif then
 			local Key = Library.MinimizeKeybind and Library.MinimizeKeybind.Value or Library.MinimizeKey.Name
 
@@ -316,6 +328,8 @@ return function(Config)
 				Duration = 6
 			})
 		end
+
+		Window.PostMinimized:Fire(tick())
 	end
 
 	Creator.AddSignal(UserInputService.InputBegan, function(Input)

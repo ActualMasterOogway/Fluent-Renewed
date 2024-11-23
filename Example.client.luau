@@ -307,10 +307,10 @@ local ToggleKeybind = Tabs.Main:Toggle("ToggleWithKeybind", {
 
 ToggleKeybind:Keybind("KeybindInToggle", {
     Title = "Keybind",
-    Default = "Unknown"
+    Default = Enum.KeyCode.Space
 })
 
-ToggleKeybind.Keybind:SetValue("A")
+Main.Options.KeybindInToggle.Value = "A"
 
 task.spawn(function()
     while true do

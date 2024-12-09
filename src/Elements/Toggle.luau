@@ -316,9 +316,9 @@ function Element:New(Idx, Config)
 	return setmetatable(Toggle, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then
-				return Toggle:SetValue(newvalue)
+				task.spawn(Toggle.SetValue, Toggle, newvalue)
 			end
-			return rawset(self, index, newvalue)
+			rawset(self, index, newvalue)
 		end
 	})
 end

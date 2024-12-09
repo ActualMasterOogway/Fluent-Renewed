@@ -200,9 +200,9 @@ function Element:New(Idx, Config)
 	return setmetatable(Keybind, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then
-				Keybind:SetValue(newvalue)
+				task.spawn(Keybind.SetValue, Keybind, newvalue)
 			end
-			return rawset(self, index, newvalue)
+			rawset(self, index, newvalue)
 		end
 	})
 end

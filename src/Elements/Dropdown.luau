@@ -534,11 +534,11 @@ function Element:New(Idx, Config)
 	return setmetatable(Dropdown, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then
-				Dropdown:SetValue(newvalue)
+				task.spawn(Dropdown.SetValue, Dropdown, newvalue)
 			elseif index == "Values" or index == "List" then
-				Dropdown:SetValues(newvalue)
+				task.spawn(Dropdown.SetValues, Dropdown, newvalue)
 			end
-			return rawset(self, index, newvalue)
+			rawset(self, index, newvalue)
 		end
 	})
 end

@@ -58,9 +58,9 @@ function Element:New(Idx, Config)
 	return setmetatable(Paragraph, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then
-				return Paragraph:SetValue(newvalue)
+				task.spawn(Paragraph.SetValue, Paragraph, newvalue)
 			end
-			return rawset(self, index, newvalue)
+			rawset(self, index, newvalue)
 		end
 	})
 

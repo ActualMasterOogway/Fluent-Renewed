@@ -89,9 +89,9 @@ function Element:New(Idx, Config)
 	return setmetatable(Input, {
 		__newindex =  function(self, index, newvalue)
 			if index == "Value" then
-				Input:SetValue(newvalue)
+				task.spawn(Input.SetValue, Input, newvalue)
 			end
-			return rawset(self, index, newvalue)
+			rawset(self, index, newvalue)
 		end
 	})
 end

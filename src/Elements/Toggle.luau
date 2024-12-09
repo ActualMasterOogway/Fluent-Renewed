@@ -104,24 +104,15 @@ function Element:New(Idx, Config)
 
 	Toggle.Keybind = setmetatable({}, { -- TODO: Rewrite this piece of shit
 		__call = function(_, self, Idx, Config)
-			local KeybindProxy = newproxy(true)
-			local Keybind = getmetatable(KeybindProxy)
-			
-			Keybind.Value = Config.Default or Config.Value or Enum.KeyCode.Unknown
-			Keybind.Toggled = false
-			Keybind.Mode = Config.Mode or "Toggle"
-			Keybind.Type = "Keybind"
-			Keybind.Callback = Config.Callback or function(Value) end
-			Keybind.ChangedCallback = Config.ChangedCallback or function(New) end
-
-			Keybind.__newindex = function(self, index, newvalue)
-				if index == "Value" then
-					return Keybind:SetValue(newvalue)
-				end
-				return rawset(self, index, newvalue)
-			end
-
-			Keybind.__metatable = "The metatable is locked"
+			local Keybind = {
+				Value = Config.Default or Config.Value or Enum.KeyCode.Unknown,
+				Toggled = false,
+				Mode = Config.Mode or "Toggle",
+				Type = "Keybind",
+				Callback = Config.Callback or function(Value) end,
+				ChangedCallback = Config.ChangedCallback or function(New) end,
+				Instance = nil
+			}
 
 			local Picking = false
 
@@ -169,61 +160,63 @@ function Element:New(Idx, Config)
 				}),
 				KeybindDisplayLabel
 			})
+
+			Keybind.Instance = KeybindDisplayFrame
 	
 			local function UpdateTogglePosition()
 				ToggleSlider.Position = UDim2.new(1, KeybindDisplayFrame.Position.X.Offset - KeybindDisplayFrame.AbsoluteSize.X - 10, 0.5, 0)
 			end
 	
 			function Keybind:GetState()
-				if UserInputService:GetFocusedTextBox() and Keybind.Mode ~= "Always" then
+				if UserInputService:GetFocusedTextBox() and self.Mode ~= "Always" then
 					return false
 				end
 		
-				if Keybind.Mode == "Always" then
+				if self.Mode == "Always" then
 					return true
-				elseif Keybind.Mode == "Hold" then
-					if Keybind.Value == "None" then
+				elseif self.Mode == "Hold" then
+					if self.Value == "None" then
 						return false
 					end
 		
-					local Key = Keybind.Value
+					local Key = self.Value
 		
 					if Key == "LeftMousebutton" or Key == "RightMousebutton" then
 						return Key == "LeftMousebutton" and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
 							or Key == "RightMousebutton"
 								and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
 					else
-						return UserInputService:IsKeyDown(Enum.KeyCode[Keybind.Value])
+						return UserInputService:IsKeyDown(Enum.KeyCode[self.Value])
 					end
 				else
-					return Keybind.Toggled
+					return self.Toggled
 				end
 			end
 		
 			function Keybind:SetValue(Key, Mode)
-				Key = Key or Keybind.Value
-				Mode = Mode or Keybind.Mode
+				Key = Key or self.Value
+				Mode = Mode or self.Mode
 		
-				Keybind.Value = Key
-				Keybind.Mode = Mode
+				self.Value = Key
+				self.Mode = Mode
 		
-				KeybindDisplayLabel.Text = Library.Utilities:Prettify(Keybind.Value)
+				KeybindDisplayLabel.Text = Library.Utilities:Prettify(self.Value)
 			end
 		
 			function Keybind:OnClick(Callback)
-				Keybind.Clicked = Callback
+				self.Clicked = Callback
 			end
 		
 			function Keybind:OnChanged(Callback)
-				Keybind.Changed = Callback
-				Library:SafeCallback(Callback, Keybind.Value, Keybind.Value)
+				self.Changed = Callback
+				Library:SafeCallback(Callback, self.Value, self.Value)
 			end
 		
 			function Keybind:DoClick()
 				Toggle:SetValue(not Toggle.Value)
 
-				Library:SafeCallback(Keybind.Callback, Keybind.Toggled)
-				Library:SafeCallback(Keybind.Clicked, Keybind.Toggled)
+				Library:SafeCallback(self.Callback, self.Toggled)
+				Library:SafeCallback(self.Clicked, self.Toggled)
 			end
 		
 			function Keybind:Destroy()
@@ -264,8 +257,8 @@ function Element:New(Idx, Config)
 		
 								Keybind:SetValue(Key)
 		
-								Library:SafeCallback(Keybind.ChangedCallback, Input.KeyCode or Input.UserInputType)
-								Library:SafeCallback(Keybind.Changed, Input.KeyCode or Input.UserInputType)
+								Library:SafeCallback(self.ChangedCallback, Input.KeyCode or Input.UserInputType)
+								Library:SafeCallback(self.Changed, Input.KeyCode or Input.UserInputType)
 							end
 						end)
 					end)
@@ -297,11 +290,9 @@ function Element:New(Idx, Config)
 	
 			Creator.AddSignal(KeybindDisplayFrame:GetPropertyChangedSignal("AbsoluteSize"), UpdateTogglePosition)
 
-			Library.Options[Idx] = KeybindProxy
+			Library.Options[Idx] = Keybind
 
-			Keybind.Instance = KeybindDisplayFrame
-
-			Toggle.Keybind = KeybindProxy
+			Toggle.Keybind = Keybind
 	
 			return Toggle.Keybind
 		end

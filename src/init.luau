@@ -140,20 +140,22 @@ function Library:SafeCallback(Function, ...)
 		return
 	end
 
-	local Success, Event = task.spawn(pcall, Function, ...)
+	task.spawn(function()
+		local Success, Event = pcall(Function, ...)
 
-	if not Success then
-		local _, i = Event:find(":%d+: ")
-
-		task.defer(error, debug.traceback(Event))
-
-		Library:Notify({
-			Title = "Interface",
-			Content = "Callback error",
-			SubContent = not i and Event or Event:sub(i + 1),
-			Duration = 5,
-		})
-	end
+		if not Success then
+			local _, i = Event:find(":%d+: ")
+	
+			task.defer(error, debug.traceback(Event))
+	
+			Library:Notify({
+				Title = "Interface",
+				Content = "Callback error",
+				SubContent = not i and Event or Event:sub(i + 1),
+				Duration = 5,
+			})
+		end
+	end)
 end
 
 function Library.Utilities:Truncate(number: number, decimals: number, round: boolean)

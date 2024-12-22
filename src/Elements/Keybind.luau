@@ -184,7 +184,7 @@ function Element:New(Idx, Config)
 						Keybind:DoClick()
 					end
 				elseif Input.UserInputType == Enum.UserInputType.Keyboard then
-					if Input.KeyCode.Name == Key then
+					if Input.KeyCode.Name == Key or Input.KeyCode == Key then
 						Keybind.Toggled = not Keybind.Toggled
 						Keybind:DoClick()
 					end
@@ -192,6 +192,8 @@ function Element:New(Idx, Config)
 			end
 		end
 	end)
+
+	Keybind:SetValue(Keybind.Value)
 
 	Library.Options[Idx] = Keybind
 

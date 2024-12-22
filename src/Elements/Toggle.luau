@@ -269,7 +269,7 @@ function Element:New(Idx, Config)
 				if not Picking and not UserInputService:GetFocusedTextBox() then
 					if Keybind.Mode == "Toggle" then
 						local Key = Keybind.Value
-		
+
 						if Key == "LeftMousebutton" or Key == "RightMousebutton" then
 							if
 								Key == "LeftMousebutton" and Input.UserInputType == Enum.UserInputType.MouseButton1
@@ -279,7 +279,7 @@ function Element:New(Idx, Config)
 								Keybind:DoClick()
 							end
 						elseif Input.UserInputType == Enum.UserInputType.Keyboard then
-							if Input.KeyCode.Name == Key then
+							if Input.KeyCode.Name == Key or Input.KeyCode == Key then
 								Keybind.Toggled = not Keybind.Toggled
 								Keybind:DoClick()
 							end
@@ -294,7 +294,14 @@ function Element:New(Idx, Config)
 
 			Toggle.Keybind = Keybind
 	
-			return Toggle.Keybind
+			return setmetatable(Toggle.Keybind, {
+				__newindex =  function(self, index, newvalue)
+					if index == "Value" then
+						task.spawn(Keybind.SetValue, Keybind, newvalue)
+					end
+					rawset(self, index, newvalue)
+				end
+			})
 		end
 	})
 

@@ -140,8 +140,10 @@ function Library:SafeCallback(Function, ...)
 		return
 	end
 
+	local Args = {...}
+
 	task.spawn(function()
-		local Success, Event = pcall(Function, ...)
+		local Success, Event = pcall(Function, table.unpack(Args))
 
 		if not Success then
 			local _, i = Event:find(":%d+: ")

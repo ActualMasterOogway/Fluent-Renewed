@@ -3,7 +3,9 @@ local Creator = require(Root.Creator)
 local New = Creator.New
 
 return function(Title, Desc, Parent, Hover, Config)
-	local Element = {}
+	local Element = {
+		CreatedAt = tick()
+	}
 
 	Config = typeof(Config) == "table" and Config or {}
 

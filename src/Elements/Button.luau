@@ -30,6 +30,8 @@ function Element:New(Config)
 		self.Library:SafeCallback(Config.Callback)
 	end)
 
+	ButtonFrame.Instance = ButtonFrame
+
 	return ButtonFrame
 end
 

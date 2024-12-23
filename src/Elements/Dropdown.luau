@@ -35,7 +35,7 @@ function Element:New(Idx, Config)
 		Opened = false,
 		Type = "Dropdown",
 		Callback = Config.Callback or function() end,
-		Changed = Config.Changed or function() end,
+		Changed = Config.Changed or function() end
 	}
 
 	local DropdownFrame = require(Components.Element)(Config.Title, Config.Description, self.Container, false)

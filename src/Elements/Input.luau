@@ -14,7 +14,7 @@ function Element:New(Idx, Config)
 	Config.Callback = Config.Callback or function() end
 
 	local Input = {
-		Value = Config.Default or "",
+		Value = Config.Default or Config.Value or "",
 		Numeric = Config.Numeric or false,
 		Finished = Config.Finished or false,
 		Callback = Config.Callback or function(Value) end,

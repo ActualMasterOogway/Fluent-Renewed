@@ -315,7 +315,7 @@ return function(Config)
 		Window.Minimized = not Window.Minimized
 		Window.Root.Visible = not Window.Minimized
 
-		Window.OnMinimized:Fire(tick())
+		Window.OnMinimized:Fire(tick(), Window.Root.Visible)
 
 		if not MinimizeNotif then
 			local Key = Library.MinimizeKeybind and Library.MinimizeKeybind.Value or Library.MinimizeKey.Name
@@ -329,7 +329,7 @@ return function(Config)
 			})
 		end
 
-		Window.PostMinimized:Fire(tick())
+		Window.PostMinimized:Fire(tick(), Window.Root.Visible)
 	end
 
 	Creator.AddSignal(UserInputService.InputBegan, function(Input)

@@ -26,9 +26,11 @@ function Element:New(Idx, Config)
 
 			return Idxes
 		end)(),
-		Value = Config.Default,
+		Value = Config.Default or Config.Value,
 		Multi = Config.Multi or false,
-		Displayer = Config.Displayer or function(Value) return typeof(Value) ~= "number" and tostring(Library.Utilities:Prettify(Value)) or Value end,
+		Displayer = Config.Displayer or function(Value)
+			return typeof(Value) ~= "number" and tostring(Library.Utilities:Prettify(Value)) or Value
+		end,
 		Buttons = {},
 		Opened = false,
 		Type = "Dropdown",
@@ -199,7 +201,8 @@ function Element:New(Idx, Config)
 			MinSize = Vector2.new(170, 0),
 		}),
 	})
-	table.insert(Library.OpenFrames, DropdownHolderCanvas)
+
+	Library.OpenFrames[#Library.OpenFrames + 1] = DropdownHolderCanvas
 
 	local function RecalculateListPosition()
 		local Add = 0
@@ -292,13 +295,13 @@ function Element:New(Idx, Config)
 
 	function Dropdown:GetActiveValues()
 		if Config.Multi then
-			local T = {}
+			local Values = {}
 
 			for Value, Bool in next, Dropdown.Value do
-				T[#T + 1] = Value
+				Values[#Values + 1] = Value
 			end
 
-			return T
+			return Values
 		else
 			return Dropdown.Value and 1 or 0
 		end
@@ -532,7 +535,7 @@ function Element:New(Idx, Config)
 	Dropdown.Instance = DropdownFrame
 
 	return setmetatable(Dropdown, {
-		__newindex =  function(self, index, newvalue)
+		__newindex = function(self, index, newvalue)
 			if index == "Value" then
 				task.spawn(Dropdown.SetValue, Dropdown, newvalue)
 			elseif index == "Values" or index == "List" then

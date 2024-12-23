@@ -22,7 +22,7 @@ function Element:New(Idx, Config)
 	assert(Config.Default, "AddColorPicker: Missing default value.")
 
 	local Colorpicker = {
-		Value = Config.Default,
+		Value = Config.Default or Config.Value,
 		Transparency = Config.Transparency or 0,
 		UpdateOnChange = Config.UpdateOnChange or Config.UpdateWhileSliding or false,
 		Type = "Colorpicker",

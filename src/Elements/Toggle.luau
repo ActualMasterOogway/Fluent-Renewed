@@ -14,7 +14,7 @@ function Element:New(Idx, Config)
 	assert(Config.Title, "Toggle - Missing Title")
 
 	local Toggle = {
-		Value = Config.Default or false,
+		Value = Config.Default or Config.Value or false,
 		Callback = Config.Callback or function(Value) end,
 		Type = "Toggle",
 	}

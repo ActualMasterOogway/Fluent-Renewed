@@ -354,7 +354,6 @@ InterfaceSection:Toggle("TransparentToggle", {
 })
 
 InterfaceSection:Keybind("MenuKeybind", { Title = "Minimize Bind", Default = "RightShift" })
-Main.MinimizeKeybind = Main.Options.MenuKeybind 
 
 Window:SelectTab(1)
 

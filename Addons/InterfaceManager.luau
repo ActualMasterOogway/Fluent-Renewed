@@ -117,7 +117,6 @@ local InterfaceManager = {} do
 			Title = "Minimize Bind", 
 			Default = Settings.MenuKeybind,
 			ChangedCallback = function(Value)
-				print(Settings.MenuKeybind, Value, typeof(Settings.MenuKeybind), typeof(Value))
 				Settings.MenuKeybind = Value
                 InterfaceManager:SaveSettings()
 			end

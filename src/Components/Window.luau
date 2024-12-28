@@ -368,7 +368,7 @@ return function(Config)
 			and Library.MinimizeKeybind.Type == "Keybind"
 			and not UserInputService:GetFocusedTextBox()
 		then
-			if Input.KeyCode.Name == Library.MinimizeKeybind.Value then
+			if Input.KeyCode.Name == Library.MinimizeKeybind.Value or Input.KeyCode.Name == Library.MinimizeKeybind.Value.Name then
 				Window:Minimize()
 			end
 		elseif (Input.KeyCode == Library.MinimizeKey or Input.KeyCode.Name == Library.MinimizeKey) and not UserInputService:GetFocusedTextBox() then
@@ -377,7 +377,7 @@ return function(Config)
 	end)
 
 	Creator.AddSignal(Window.HideButton.MouseButton1Click, function()
-		Library.CreatedWindow:Minimize()
+		Window:Minimize()
 	end)
 
 	Creator.AddSignal(Window.HideButton.InputBegan, function(Input)
@@ -405,7 +405,7 @@ return function(Config)
 
 	if UserInputService.TouchEnabled then
 		Creator.AddSignal(Window.HideButton.TouchTap, function()
-			Library.CreatedWindow:Minimize()
+			Window:Minimize()
 		end)
 	end
 

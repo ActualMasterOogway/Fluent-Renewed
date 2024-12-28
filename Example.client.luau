@@ -353,7 +353,13 @@ InterfaceSection:Toggle("TransparentToggle", {
     end
 })
 
-InterfaceSection:Keybind("MenuKeybind", { Title = "Minimize Bind", Default = Main.MinimizeKey or Enum.KeyCode.RightShift})
+InterfaceSection:Keybind("MenuKeybind", {
+    Title = "Minimize Bind", 
+    Default = Main.MinimizeKey or Enum.KeyCode.RightShift,
+    ChangedCallback = function(Value)
+        Main.MinimizeKey = Value
+    end
+})
 Main.MinimizeKeybind = Main.Options.MenuKeybind
 
 Window:SelectTab(1)

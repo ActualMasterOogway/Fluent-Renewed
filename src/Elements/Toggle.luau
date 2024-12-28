@@ -161,7 +161,17 @@ function Element:New(Idx, Config)
 				KeybindDisplayLabel
 			})
 
-			Keybind.Instance = KeybindDisplayFrame
+			Keybind.Instance = setmetatable({
+				CreatedAt = tick()
+			}, {
+				__index = function(self, idx)
+					if rawget(self, idx) then
+						return rawget(self, idx)
+					else
+						return KeybindDisplayFrame[idx]
+					end
+				end
+			})
 	
 			local function UpdateTogglePosition()
 				ToggleSlider.Position = UDim2.new(1, KeybindDisplayFrame.Position.X.Offset - KeybindDisplayFrame.AbsoluteSize.X - 10, 0.5, 0)

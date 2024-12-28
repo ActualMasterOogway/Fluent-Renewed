@@ -19,6 +19,10 @@ local Instant = Flipper.Instant.new
 local New = Creator.New
 
 return function(Config)
+	assert(typeof(Config.Mobile) == "table", "Config key 'Mobile' must be a table!")
+	assert(typeof(Config.Mobile.GetIcon) == "function", "Mobile Config key 'GetIcon' must be a function!")
+	assert(typeof(Config.Mobile.Size) == "UDim2", "Mobile Config key 'Size' must be a UDim2!")
+	
 	local Window = {
 		Minimized = false,
 		OnMinimized = Signal.new(),
@@ -39,6 +43,7 @@ return function(Config)
 	local Dragging, DragInput, MousePos, StartPos = false
 	local Resizing, ResizePos = false
 	local MinimizeNotif = false
+	local IsDraggingHideButton, DragInput, DragStart, DragStartPos = false
 
 	Window.AcrylicPaint = Acrylic.AcrylicPaint()
 	Window.TabWidth = Config.TabWidth
@@ -135,6 +140,17 @@ return function(Config)
 		ResizeStartFrame,
 	})
 
+	Window.HideButton = New("ImageButton", {
+		Visible = Library.Utilities:GetOS() == "Mobile",
+		Size = Config.Mobile.Size,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(1, -Config.Mobile.Size.X.Offset - 25, 0.5, -Config.Mobile.Size.Y.Offset / 2),
+		Parent = Config.Parent,
+		Image = Config.Mobile.GetIcon(false).Image,
+		ImageRectOffset = Config.Mobile.GetIcon(false).ImageRectOffset,
+		ImageRectSize = Config.Mobile.GetIcon(false).ImageRectSize
+	})
+
 	Window.TitleBar = require(script.Parent.TitleBar)({
 		Title = Config.Title,
 		SubTitle = Config.SubTitle,
@@ -142,7 +158,7 @@ return function(Config)
 		Window = Window,
 	})
 
-	if require(Root).UseAcrylic then
+	if Library.UseAcrylic then
 		Window.AcrylicPaint.AddParent(Window.Root)
 	end
 
@@ -282,6 +298,10 @@ return function(Config)
 			end
 		end
 
+		if Input.UserInputType == Enum.UserInputType.MouseMovement and IsDraggingHideButton then
+			DragInput = Input
+		end
+
 		if
 			(Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch)
 			and Resizing
@@ -308,7 +328,9 @@ return function(Config)
 	end)
 
 	Creator.AddSignal(Window.TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-		Window.TabHolder.CanvasSize = UDim2.new(0, 0, 0, Window.TabHolder.UIListLayout.AbsoluteContentSize.Y)
+		if Window.TabHolder.CanvasSize ~= UDim2.fromOffset(0, Window.TabHolder.UIListLayout.AbsoluteContentSize.Y) then
+			Window.TabHolder.CanvasSize = UDim2.fromOffset(0, Window.TabHolder.UIListLayout.AbsoluteContentSize.Y)
+		end
 	end)
 
 	function Window:Minimize()
@@ -329,6 +351,14 @@ return function(Config)
 			})
 		end
 
+		if Library.Utilities:GetOS() == "Mobile" then
+			local Icon = Config.Mobile.GetIcon(Window.Minimized)
+
+			Window.HideButton.Image = Icon.Image
+			Window.HideButton.ImageRectOffset = Icon.ImageRectOffset
+			Window.HideButton.ImageRectSize = Icon.ImageRectSize
+		end
+
 		Window.PostMinimized:Fire(tick(), Window.Root.Visible)
 	end
 
@@ -346,8 +376,41 @@ return function(Config)
 		end
 	end)
 
+	Creator.AddSignal(Window.HideButton.MouseButton1Click, function()
+		Library.CreatedWindow:Minimize()
+	end)
+
+	Creator.AddSignal(Window.HideButton.InputBegan, function(Input)
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+			IsDraggingHideButton = true
+			DragStart = Input.Position
+			StartPos = Window.HideButton.Position
+
+			local DragThread = task.spawn(function()
+				while Library.Loaded and IsDraggingHideButton and DragInput and task.wait() do
+					local delta = DragInput.Position - DragStart
+					Window.HideButton.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
+				end
+			end)
+
+			local InputEnded; InputEnded = Input.Changed:Connect(function()
+				if Input.UserInputState == Enum.UserInputState.End then
+					IsDraggingHideButton = false
+					task.cancel(DragThread)
+					InputEnded:Disconnect()
+				end
+			end)
+		end
+	end)
+
+	if UserInputService.TouchEnabled then
+		Creator.AddSignal(Window.HideButton.TouchTap, function()
+			Library.CreatedWindow:Minimize()
+		end)
+	end
+
 	function Window:Destroy()
-		if require(Root).UseAcrylic then
+		if Library.UseAcrylic then
 			Window.AcrylicPaint.Model:Destroy()
 		end
 		Window.Root:Destroy()

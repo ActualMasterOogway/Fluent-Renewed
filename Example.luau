@@ -14,11 +14,11 @@ local Window = Library:CreateWindow{
     MinimizeKey = Enum.KeyCode.RightControl -- Used when theres no MinimizeKeybind
 }
 
--- Fluent Renewed provides ALL 1470 Lucide 0.395.0 Icons https://lucide.dev/icons/ for the tabs, icons are optional
+-- Fluent Renewed provides ALL 1544 Lucide 0.469.0 https://lucide.dev/icons/ Icons and ALL Phosphor 2.1.0 https://phosphoricons.com/ Icons for the tabs, icons are optional
 local Tabs = {
     Main = Window:CreateTab{
         Title = "Main",
-        Icon = "circle-user-round"
+        Icon = "phosphor-users-bold"
     },
     Settings = Window:CreateTab{
         Title = "Settings",

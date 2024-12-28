@@ -288,9 +288,10 @@ function Library:Window(Config)
 
 		TabWidth = Config.TabWidth or 160,
 		Mobile = Config.Mobile or {
-			GetIcon = function(Minimized)
-				
-			end
+			GetIcon = function(IsMinimized: boolean): { Image: string, ImageRectOffset: Vector2, ImageRectSize: Vector2 }
+				return Library.Utilities:GetIcon(IsMinimized and "phosphor-eye" or "phosphor-eye-slash")
+			end,
+			Size = UDim2.fromOffset(30, 30)
 		}
 	}
 

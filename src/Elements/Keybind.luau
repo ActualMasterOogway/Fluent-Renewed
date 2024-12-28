@@ -108,6 +108,8 @@ function Element:New(Idx, Config)
 		Keybind.Mode = Mode
 
 		KeybindDisplayLabel.Text = Library.Utilities:Prettify(Keybind.Value)
+		Library:SafeCallback(Keybind.ChangedCallback, Key)
+		Library:SafeCallback(Keybind.Changed, Key)
 	end
 
 	function Keybind:OnClick(Callback)

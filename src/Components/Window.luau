@@ -340,7 +340,7 @@ return function(Config)
 		Window.OnMinimized:Fire(tick(), Window.Root.Visible)
 
 		if not MinimizeNotif then
-			local Key = Library.MinimizeKeybind and Library.MinimizeKeybind.Value or Library.MinimizeKey.Name
+			local Key = Library.MinimizeKeybind and Library.MinimizeKeybind.Value or typeof(Library.MinimizeKey) == "string" and Library.MinimizeKey or Library.MinimizeKey.Name
 
 			MinimizeNotif = true
 			
@@ -371,7 +371,7 @@ return function(Config)
 			if Input.KeyCode.Name == Library.MinimizeKeybind.Value then
 				Window:Minimize()
 			end
-		elseif Input.KeyCode == Library.MinimizeKey and not UserInputService:GetFocusedTextBox() then
+		elseif (Input.KeyCode == Library.MinimizeKey or Input.KeyCode.Name == Library.MinimizeKey) and not UserInputService:GetFocusedTextBox() then
 			Window:Minimize()
 		end
 	end)

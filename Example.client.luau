@@ -8,7 +8,7 @@ local Window = Main:Window{
     Resize = true,
     Acrylic = true,
     Theme = "Vynixu",
-    MinimizeKey = Enum.KeyCode.RightControl
+    MinimizeKey = Enum.KeyCode.P
 }
 
 local Tabs = {
@@ -353,7 +353,8 @@ InterfaceSection:Toggle("TransparentToggle", {
     end
 })
 
-InterfaceSection:Keybind("MenuKeybind", { Title = "Minimize Bind", Default = "RightShift" })
+InterfaceSection:Keybind("MenuKeybind", { Title = "Minimize Bind", Default = Main.MinimizeKey or Enum.KeyCode.RightShift})
+Main.MinimizeKeybind = Main.Options.MenuKeybind
 
 Window:SelectTab(1)
 

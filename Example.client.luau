@@ -14,7 +14,7 @@ local Window = Main:Window{
 local Tabs = {
     Main = Window:Tab{
         Title = "Main",
-        Icon = "circle-user-round"
+        Icon = "phosphor-users-bold"
     },
     Settings = Window:Tab{
         Title = "Settings",

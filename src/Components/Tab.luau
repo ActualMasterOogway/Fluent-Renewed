@@ -80,8 +80,8 @@ function TabModule:New(Title, Icon, Parent)
 			Size = UDim2.fromOffset(16, 16),
 			Position = UDim2.new(0, 8, 0.5, 0),
 			BackgroundTransparency = 1,
-			ImageRectOffset = Icon and Icon.ImageRectOffset or Vector2.new(),
-			ImageRectSize = Icon and Icon.ImageRectSize or Vector2.new(),
+			ImageRectOffset = Icon and Icon.ImageRectOffset or Vector2.zero,
+			ImageRectSize = Icon and Icon.ImageRectSize or Vector2.zero,
 			Image = Icon and Icon.Image or nil,
 			ThemeTag = {
 				ImageColor3 = "Text",

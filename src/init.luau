@@ -1,10 +1,10 @@
-local function Clone(ToClone)
+local function Clone<Original>(ToClone: any & Original): (Original, boolean)
 	local Type = typeof(ToClone)
 
 	if Type == "function" and (clonefunc or clonefunction) then
 		return (clonefunc or clonefunction)(ToClone), true
-	elseif Type == "Instance" and (cloneref or clonerefrence) then
-		return (cloneref or clonerefrence)(ToClone), true
+	elseif Type == "Instance" and (cloneref or clonereference) then
+		return (cloneref or clonereference)(ToClone), true
 	elseif Type == "table" then
 		local function deepcopy(orig, copies)
 			copies = copies or {}
@@ -39,9 +39,11 @@ local function Clone(ToClone)
 	end
 end
 
-local MarketplaceService: MarketplaceService = Clone(game:GetService("MarketplaceService"))
-local TweenService: TweenService = Clone(game:GetService("TweenService"))
-local Camera: Camera = Clone(game:GetService("Workspace")).CurrentCamera
+local MarketplaceService = Clone(game:GetService("MarketplaceService"))
+local TweenService = Clone(game:GetService("TweenService"))
+local Camera = Clone(game:GetService("Workspace")).CurrentCamera
+local UserInputService = Clone(game:GetService("UserInputService"))
+local GuiService = Clone(game:GetService("GuiService"))
 
 local Root = script
 local Components = Root.Components
@@ -55,14 +57,14 @@ local Signal = require(Root.Packages.Flipper.Signal)
 
 local NotificationModule = require(Components.Notification)
 
-local SharedTable = shared or _G or (getgenv and getgenv()) or getfenv()
+local SharedTable = shared or _G or (getgenv and getgenv()) or getfenv(1)
 local New = Creator.New
 
-local GUI = New("ScreenGui", {
+local BaseContainer = New("ScreenGui", {
 	Name = "Fluent Renewed Base GUI"
 })
 
-GUI.Parent = (function()
+BaseContainer.Parent = (function()
 	local success, result = pcall(function()
 		return (gethui or get_hidden_ui)()
 	end)
@@ -72,9 +74,11 @@ GUI.Parent = (function()
 	end
 
 	success, result = pcall(function()
-		local coreGui = game:GetService("CoreGui")
-		coreGui:GetFullName()
-		return coreGui
+		local CoreGui = game:GetService("CoreGui")
+
+		CoreGui:GetFullName()
+
+		return CoreGui
 	end)
 
 	if success and result then
@@ -82,7 +86,7 @@ GUI.Parent = (function()
 	end
 
 	success, result = pcall(function()
-		return (game:IsLoaded() or (game.Loaded:Wait() or true)) and game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+		return (game:IsLoaded() or game.Loaded:Wait() or true) and game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui", 10)
 	end)
 
 	if success and result then
@@ -90,7 +94,11 @@ GUI.Parent = (function()
 	end
 
 	success, result = pcall(function()
-		return game:GetService("StarterGui")
+		local StarterGui = game:GetService("StarterGui")
+
+		StarterGui:GetFullName()
+
+		return StarterGui
 	end)
 
 	if success and result then
@@ -102,7 +110,7 @@ end)()
 
 SharedTable.FluentRenewed = SharedTable.FluentRenewed or {}
 
-NotificationModule:Init(GUI)
+NotificationModule:Init(BaseContainer)
 
 local Library = {
 	Version = "1.0.2",
@@ -116,10 +124,12 @@ local Library = {
 	ThemeChanged = Signal.new(),
 	CreatedWindow = nil,
 	WindowFrame = nil,
+	UIContainer = BaseContainer.Parent,
 	Utilities = {
 		Themes = Themes,
 		Shared = SharedTable,
-		Creator = Creator
+		Creator = Creator,
+		Icons = Icons
 	},
 	Connections = Creator.Signals,
 	Unloaded = false,
@@ -132,7 +142,7 @@ local Library = {
 	Transparency = true,
 	MinimizeKey = Enum.KeyCode.LeftControl,
 
-	GUI = GUI
+	GUI = BaseContainer
 }
 
 function Library:SafeCallback(Function, ...)
@@ -158,6 +168,11 @@ function Library:SafeCallback(Function, ...)
 			})
 		end
 	end)
+end
+
+function Library.Utilities:Resize(x: number, y: number)
+    local X, Y, CurrentSize = x / 1920, y / 1080, Camera.ViewportSize
+    return CurrentSize.X * X, CurrentSize.Y * Y
 end
 
 function Library.Utilities:Truncate(number: number, decimals: number, round: boolean)
@@ -192,8 +207,26 @@ function Library.Utilities:Prettify(ToPrettify: EnumItem & string & number)
 	end
 end
 
-function Library.Utilities:Clone(ToClone: {[any]: any} & ((...any) -> ...any) & Instance)
+function Library.Utilities:Clone<Original>(ToClone: {[any]: any} & ((...any) -> ...any) & Object & Original): (Original, boolean)
 	return Clone(ToClone)
+end
+
+function Library.Utilities:GetOS()
+	local OSName = "Unknown"
+	
+	if GuiService:IsTenFootInterface() then
+		local L2Button_Name = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonL2)
+
+		OSName = L2Button_Name == "ButtonLT" and "Xbox" or L2Button_Name == "ButtonL2" and "PlayStation"
+	elseif GuiService.IsWindows then
+		OSName = "Windows"
+	elseif version():find("^0.") == 1 then
+		OSName = "macOS"
+	elseif version():find("^2.") == 1 then
+		OSName = UserInputService.VREnabled and "MetaHorizon" or "Mobile"
+	end
+
+	return OSName
 end
 
 local Elements = {}
@@ -244,15 +277,24 @@ function Library:Window(Config)
 	end
 
 	local Window = require(Components.Window){
-		Parent = GUI,
+		Config = Config,
+		Parent = BaseContainer,
+
 		Size = Config.Size,
 		MinSize = Config.MinSize,
+
 		Title = Config.Title,
 		SubTitle = Config.SubTitle or "Made with Fluent Renewed",
+
 		TabWidth = Config.TabWidth or 160,
+		Mobile = Config.Mobile or {
+			GetIcon = function(Minimized)
+				
+			end
+		}
 	}
 
-	GUI.Name = `FluentRenewed_{Config.Title}`
+	BaseContainer.Name = `FluentRenewed_{Config.Title}`
 
 	Library.CreatedWindow = Window
 	Library:SetTheme(Config.Theme)
@@ -370,11 +412,6 @@ end
 
 function Library:Notify(Config)
 	return NotificationModule:New(Config)
-end
-
-function Library.Utilities:Resize(x, y)
-    local X, Y, CurrentSize = x / 1920, y / 1080, Camera.ViewportSize
-    return CurrentSize.X * X, CurrentSize.Y * Y
 end
 
 return Library

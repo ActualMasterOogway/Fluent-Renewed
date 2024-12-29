@@ -376,10 +376,6 @@ return function(Config)
 		end
 	end)
 
-	Creator.AddSignal(Window.HideButton.MouseButton1Click, function()
-		Window:Minimize()
-	end)
-
 	Creator.AddSignal(Window.HideButton.InputBegan, function(Input)
 		if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 			IsDraggingHideButton = true
@@ -403,10 +399,14 @@ return function(Config)
 		end
 	end)
 
-	if UserInputService.TouchEnabled then
+	if Library.Utilities:GetOS() == "Mobile" then
 		Creator.AddSignal(Window.HideButton.TouchTap, function()
 			Window:Minimize()
 		end)
+	else
+		Creator.AddSignal(Window.HideButton.MouseButton1Click, function()
+			Window:Minimize()
+		end)	
 	end
 
 	function Window:Destroy()

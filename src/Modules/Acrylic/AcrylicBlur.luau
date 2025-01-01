@@ -1,4 +1,5 @@
-local Creator = require(script.Parent.Parent.Creator)
+local Root = script.Parent.Parent.Parent
+local Creator = require(Root.Modules.Creator)
 local createAcrylic = require(script.Parent.CreateAcrylic)
 local viewportPointToWorld, getOffset = unpack(require(script.Parent.Utils))
 
@@ -25,16 +26,9 @@ local function createAcrylicBlur(distance)
 	end
 
 	local function render()
-		local res = game:GetService("Workspace").CurrentCamera
-		if res then
-			res = res.CFrame
-		end
-		local cond = res
-		if not cond then
-			cond = CFrame.new()
-		end
+		local camera = game:GetService("Workspace").CurrentCamera
+		local cameraTransform = if camera then camera.CFrame else CFrame.identity
 
-		local camera = cond
 		local topLeft = positions.topLeft
 		local topRight = positions.topRight
 		local bottomRight = positions.bottomRight
@@ -47,7 +41,7 @@ local function createAcrylicBlur(distance)
 		local height = (topRight3D - bottomRight3D).Magnitude
 
 		model.CFrame =
-			CFrame.fromMatrix((topLeft3D + bottomRight3D) / 2, camera.XVector, camera.YVector, camera.ZVector)
+			CFrame.fromMatrix((topLeft3D + bottomRight3D) / 2, cameraTransform.XVector, cameraTransform.YVector, cameraTransform.ZVector)
 
 		if mesh then
 			mesh.Scale = Vector3.new(width, height, 0)
@@ -69,9 +63,9 @@ local function createAcrylicBlur(distance)
 			return
 		end
 
-		table.insert(cleanups, camera:GetPropertyChangedSignal("CFrame"):Connect(render))
-		table.insert(cleanups, camera:GetPropertyChangedSignal("ViewportSize"):Connect(render))
-		table.insert(cleanups, camera:GetPropertyChangedSignal("FieldOfView"):Connect(render))
+		cleanups[#cleanups + 1] = camera:GetPropertyChangedSignal("CFrame"):Connect(render)
+		cleanups[#cleanups + 1] = camera:GetPropertyChangedSignal("ViewportSize"):Connect(render)
+		cleanups[#cleanups + 1] = camera:GetPropertyChangedSignal("FieldOfView"):Connect(render)
 		task.spawn(render)
 	end
 

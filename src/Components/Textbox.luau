@@ -1,7 +1,7 @@
 local TextService = game:GetService("TextService")
 local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 local New = Creator.New
 
 return function(Parent, Acrylic)

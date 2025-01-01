@@ -46,7 +46,7 @@ local VEC2 = {['0_0'] = Vector2.new(0, 0), ['64_0'] = Vector2.new(64, 0), ['128_
 game:GetService'ContentProvider':PreloadAsync{icons_1, icons_2, icons_3, icons_4, icons_5, icons_6, icons_7, icons_8, icons_9, icons_10, icons_11, icons_12, icons_13, icons_14, icons_15, icons_16, icons_17, icons_18, icons_19, icons_20, icons_21, icons_22, icons_23, icons_24, icons_25, icons_26, icons_27, icons_28, icons_29, icons_30, icons_31, icons_32, icons_33, icons_34, icons_35, icons_36, icons_37, icons_38, icons_39, icons_40, icons_41, icons_42}
 
 return {
-	SetIcon = function(self, Image: ImageLabel | ImageButton, IconName: string)
+	SetIcon = function(self, Image: ImageLabel & ImageButton, IconName: string)
 		local IconData = self[IconName]
 
 		if typeof(IconData) ~= 'table' then
@@ -92,9 +92,11 @@ return {
 			end
 		end
 
-		for i,v in next, IconData do
-			Image[i] = v
-		end
+		Image.ImageRectSize = IconData.ImageRectSize
+		Image.ImageRectOffset = IconData.ImageRectOffset
+		Image.Image = IconData.Image
+
+		return nil :: never
 	end,
 	['Close'] = "rbxassetid://9886659671",
 	['Min'] = "rbxassetid://9886659276",

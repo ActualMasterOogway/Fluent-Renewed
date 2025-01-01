@@ -1,13 +1,10 @@
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-local RenderStepped = RunService.RenderStepped
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 
 local New = Creator.New
 local Components = Root.Components
@@ -52,7 +49,7 @@ function Element:New(Idx, Config)
 		New("UICorner", {
 			CornerRadius = UDim.new(0, 4),
 		}),
-	})
+	}) :: Frame
 
 	local DisplayFrame = New("ImageLabel", {
 		Size = UDim2.fromOffset(26, 26),
@@ -68,7 +65,7 @@ function Element:New(Idx, Config)
 			CornerRadius = UDim.new(0, 4),
 		}),
 		DisplayFrameColor,
-	})
+	}) :: ImageLabel
 
 	local function CreateColorDialog()
 		local Dialog = require(Components.Dialog):Create()
@@ -88,7 +85,7 @@ function Element:New(Idx, Config)
 			return Box
 		end
 
-		local function CreateInputLabel(Text, Pos)
+		local function CreateInputLabel(Text, Pos): TextLabel
 			return New("TextLabel", {
 				FontFace = Font.new(
 					"rbxasset://fonts/families/GothamSSm.json",
@@ -106,12 +103,12 @@ function Element:New(Idx, Config)
 				ThemeTag = {
 					TextColor3 = "Text",
 				},
-			})
+			}) :: TextLabel
 		end
 
 		local function GetRGB()
 			local Value = Color3.fromHSV(Hue, Sat, Vib)
-			return { R = math.floor(Value.r * 255), G = math.floor(Value.g * 255), B = math.floor(Value.b * 255) }
+			return { R = math.floor(Value.R * 255), G = math.floor(Value.G * 255), B = math.floor(Value.B * 255) }
 		end
 
 		local SatCursor = New("ImageLabel", {
@@ -120,7 +117,7 @@ function Element:New(Idx, Config)
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,
 			Image = "http://www.roblox.com/asset/?id=4805639000",
-		})
+		}) :: ImageLabel
 
 		local SatVibMap = New("ImageLabel", {
 			Size = UDim2.fromOffset(180, 160),
@@ -134,7 +131,7 @@ function Element:New(Idx, Config)
 				CornerRadius = UDim.new(0, 4),
 			}),
 			SatCursor,
-		})
+		}) :: ImageLabel
 
 		local OldColorFrame = New("Frame", {
 			BackgroundColor3 = Colorpicker.Value,
@@ -144,7 +141,7 @@ function Element:New(Idx, Config)
 			New("UICorner", {
 				CornerRadius = UDim.new(0, 4),
 			}),
-		})
+		}) :: Frame
 
 		local OldColorFrameChecker = New("ImageLabel", {
 			Image = "http://www.roblox.com/asset/?id=14204231522",
@@ -164,7 +161,7 @@ function Element:New(Idx, Config)
 				Transparency = 0.75,
 			}),
 			OldColorFrame,
-		})
+		}) :: ImageLabel
 
 		local DialogDisplayFrame = New("Frame", {
 			BackgroundColor3 = Colorpicker.Value,
@@ -174,7 +171,7 @@ function Element:New(Idx, Config)
 			New("UICorner", {
 				CornerRadius = UDim.new(0, 4),
 			}),
-		})
+		}) :: Frame
 
 		local DialogDisplayFrameChecker = New("ImageLabel", {
 			Image = "http://www.roblox.com/asset/?id=14204231522",
@@ -194,24 +191,24 @@ function Element:New(Idx, Config)
 				Transparency = 0.75,
 			}),
 			DialogDisplayFrame,
-		})
+		}) :: ImageLabel
 
 		local SequenceTable = {}
 
 		for Color = 0, 1, 0.1 do
-			table.insert(SequenceTable, ColorSequenceKeypoint.new(Color, Color3.fromHSV(Color, 1, 1)))
+			SequenceTable[#SequenceTable + 1] = ColorSequenceKeypoint.new(Color, Color3.fromHSV(Color, 1, 1))
 		end
 
 		local HueSliderGradient = New("UIGradient", {
 			Color = ColorSequence.new(SequenceTable),
 			Rotation = 90,
-		})
+		}) :: UIGradient
 
 		local HueDragHolder = New("Frame", {
 			Size = UDim2.new(1, 0, 1, -10),
 			Position = UDim2.fromOffset(0, 5),
 			BackgroundTransparency = 1,
-		})
+		}) :: Frame
 
 		local HueDrag = New("ImageLabel", {
 			Size = UDim2.fromOffset(14, 14),
@@ -220,7 +217,7 @@ function Element:New(Idx, Config)
 			ThemeTag = {
 				ImageColor3 = "DialogInput",
 			},
-		})
+		}) :: ImageLabel
 
 		local HueSlider = New("Frame", {
 			Size = UDim2.fromOffset(12, 190),
@@ -232,7 +229,7 @@ function Element:New(Idx, Config)
 			}),
 			HueSliderGradient,
 			HueDragHolder,
-		})
+		}) :: Frame
 
 		local HexInput = CreateInput()
 		HexInput.Frame.Position = UDim2.fromOffset(Config.Transparency and 260 or 240, 55)
@@ -263,7 +260,7 @@ function Element:New(Idx, Config)
 				Size = UDim2.new(1, 0, 1, -10),
 				Position = UDim2.fromOffset(0, 5),
 				BackgroundTransparency = 1,
-			})
+			}) :: Frame
 
 			TransparencyDrag = New("ImageLabel", {
 				Size = UDim2.fromOffset(14, 14),
@@ -272,7 +269,7 @@ function Element:New(Idx, Config)
 				ThemeTag = {
 					ImageColor3 = "DialogInput",
 				},
-			})
+			}) :: ImageLabel
 
 			TransparencyColor = New("Frame", {
 				Size = UDim2.fromScale(1, 1),
@@ -287,7 +284,7 @@ function Element:New(Idx, Config)
 				New("UICorner", {
 					CornerRadius = UDim.new(1, 0),
 				}),
-			})
+			}) :: Frame
 
 			TransparencySlider = New("Frame", {
 				Size = UDim2.fromOffset(12, 190),
@@ -313,7 +310,7 @@ function Element:New(Idx, Config)
 				}),
 				TransparencyColor,
 				TransparencyDragHolder,
-			})
+			}) :: Frame
 		end
 
 		local function Display()
@@ -516,8 +513,12 @@ function Element:New(Idx, Config)
 		DisplayFrameColor.BackgroundColor3 = Colorpicker.Value
 		DisplayFrameColor.BackgroundTransparency = Colorpicker.Transparency
 
-		Library:SafeCallback(Colorpicker.Callback, Colorpicker.Value)
-		Library:SafeCallback(Colorpicker.Changed, Colorpicker.Value)
+		if typeof(Colorpicker.Callback) == "function" then
+			Library:SafeCallback(Colorpicker.Callback, Colorpicker.Value)
+		end
+		if typeof(Colorpicker.Changed) == "function" then
+			Library:SafeCallback(Colorpicker.Changed, Colorpicker.Value)
+		end
 	end
 
 	function Colorpicker:SetValue(HSV, Transparency)

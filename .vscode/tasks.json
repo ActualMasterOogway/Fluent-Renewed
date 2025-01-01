@@ -1,0 +1,49 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "[WB] Erase Build History",
+			"type": "shell",
+			"command": "sh",
+			"args": [
+				"-c", 
+				"if [ -d 'Distribution' ]; then rm -rf Distribution; else rmdir /s /q Distribution; fi"
+			],
+			"windows": {
+				"command": "cmd",
+				"args": [
+					"/c", 
+					"if exist Distribution (rmdir /s /q Distribution)"
+				]
+			},
+			"group": {
+				"kind": "none",
+				"isDefault": false
+			},
+			"options": {
+				"cwd": "${workspaceFolder}" 
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "[WB] Build Project",
+			"dependsOn": "[WB] Erase Build History",
+			"type": "shell",
+			"command": "lune",
+			"args": [
+				"run", 
+				"Build",
+				"bundle",
+				"header=Lune/Build/Header.luau"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}" 
+			},
+			"problemMatcher": []
+		}
+	]
+}

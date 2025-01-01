@@ -2,9 +2,9 @@
 
 local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
-local Creator = require(Root.Creator)
-local Acrylic = require(Root.Acrylic)
-local Signal = require(Root.Packages.Flipper.Signal)
+local Creator = require(Root.Modules.Creator)
+local Acrylic = require(Root.Modules.Acrylic)
+local Signal = require(Root.Packages.Signal)
 local Assets = require(script.Parent.Assets)
 local Components = script.Parent
 

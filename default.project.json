@@ -1,6 +1,9 @@
 {
-  "name": "MainModule", 
-  "tree": {
-    "$path": "src"
-  }
+	"name": "Fluent Renewed",
+	"tree": {
+		"$path": "Src",
+		"Packages": {
+			"$path": "Packages"
+		}
+	}
 }

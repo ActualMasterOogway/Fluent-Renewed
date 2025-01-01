@@ -1,5 +1,5 @@
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 local New = Creator.New
 
 return function(Title, Desc, Parent, Hover, Config)
@@ -21,7 +21,7 @@ return function(Title, Desc, Parent, Hover, Config)
 		ThemeTag = {
 			TextColor3 = "Text",
 		},
-	})
+	}) :: TextLabel
 
 	Element.DescLabel = New("TextLabel", {
 		FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
@@ -37,7 +37,7 @@ return function(Title, Desc, Parent, Hover, Config)
 		ThemeTag = {
 			TextColor3 = "SubText",
 		},
-	})
+	}) :: TextLabel
 
 	Element.LabelHolder = New("Frame", {
 		AutomaticSize = Enum.AutomaticSize.Y,
@@ -56,7 +56,7 @@ return function(Title, Desc, Parent, Hover, Config)
 		}),
 		Element.TitleLabel,
 		Element.DescLabel,
-	})
+	}) :: Frame
 
 	Element.Border = New("UIStroke", {
 		Transparency = 0.5,
@@ -65,7 +65,7 @@ return function(Title, Desc, Parent, Hover, Config)
 		ThemeTag = {
 			Color = "ElementBorder",
 		},
-	})
+	}) :: UIStroke
 
 	Element.Frame = New("TextButton", {
 		Size = UDim2.new(1, 0, 0, 0),
@@ -85,7 +85,7 @@ return function(Title, Desc, Parent, Hover, Config)
 		}),
 		Element.Border,
 		Element.LabelHolder,
-	})
+	}) :: TextButton
 
 	function Element:SetTitle(Set)
 		Element.TitleLabel.Text = Set
@@ -109,7 +109,7 @@ return function(Title, Desc, Parent, Hover, Config)
 
 	Element:SetTitle(Title)
 	Element:SetDesc(Desc)
-
+	
 	if Hover then
 		local Themes = Root.Themes
 		local Motor, SetTransparency = Creator.SpringMotor(

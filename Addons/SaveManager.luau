@@ -79,9 +79,9 @@ local SaveManager = {} do
 		self:BuildFolderTree()
 	end
 
-	function SaveManager:Save(name)
+	function SaveManager:Save(name): (boolean, string?)
 		if (not name) then
-			return false, "no config file is selected"
+			return false, "No config file is selected"
 		end
 
 		local fullPath = `{self.Folder}/settings/{name}.json`
@@ -94,25 +94,25 @@ local SaveManager = {} do
 			if not self.Parser[option.Type] then continue end
 			if self.Ignore[idx] then continue end
 
-			table.insert(data.objects, self.Parser[option.Type].Save(idx, option))
+			data.objects[#data.objects + 1] = self.Parser[option.Type].Save(idx, option)
 		end
 
-		table.sort(data.objects, function(v1, v2)
+		table.sort(data.objects, function(v1: { Timestamp: number }, v2: { Timestamp: number })
 			return v1.Timestamp < v2.Timestamp
 		end)
 
 		local success, encoded = pcall(httpService.JSONEncode, httpService, data)
 		if not success then
-			return false, "failed to encode data"
+			return false, "Failed to JSON-Encode data"
 		end
 
 		writefile(fullPath, encoded)
 		return true
 	end
 
-	function SaveManager:Load(name)
+	function SaveManager:Load(name): (boolean, string?)
 		if (not name) then
-			return false, "no config file is selected"
+			return false, "No config file is selected"
 		end
 		
 		local file = `{self.Folder}/settings/{name}.json`
@@ -162,16 +162,18 @@ local SaveManager = {} do
 				local pos = file:find(".json", 1, true)
 				local start = pos
 
-				local char = file:sub(pos, pos)
-				while char ~= "/" and char ~= "\\" and char ~= "" do
-					pos = pos - 1
-					char = file:sub(pos, pos)
-				end
+				if typeof(pos) == "number" and typeof(start) == "number" then
+					local char = file:sub(pos, pos)
+					while char ~= "/" and char ~= "\\" and char ~= "" do
+						pos = pos - 1
+						char = file:sub(pos, pos)
+					end
 
-				if char == "/" or char == "\\" then
-					local name = file:sub(pos + 1, start - 1)
-					if name ~= "options" then
-						table.insert(out, name)
+					if char == "/" or char == "\\" then
+						local name = file:sub(pos + 1, start - 1)
+						if name ~= "options" then
+							out[#out + 1] = name
+						end
 					end
 				end
 			end
@@ -306,7 +308,7 @@ local SaveManager = {} do
 		local AutoloadButton
 		AutoloadButton = section:AddButton({Title = "Set as autoload", Description = "Current autoload config: none", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
-			writefile(self.Folder .. "/settings/autoload.txt", name)
+			writefile(`{self.Folder}/settings/autoload.txt`, name)
 			AutoloadButton:SetDesc("Current autoload config: " .. name)
 			self.Library:Notify({
 				Title = "Interface",
@@ -316,8 +318,8 @@ local SaveManager = {} do
 			})
 		end})
 
-		if isfile(self.Folder .. "/settings/autoload.txt") then
-			local name = readfile(self.Folder .. "/settings/autoload.txt")
+		if isfile(`{self.Folder}/settings/autoload.txt`) then
+			local name = readfile(`{self.Folder}/settings/autoload.txt`)
 			AutoloadButton:SetDesc("Current autoload config: " .. name)
 		end
 

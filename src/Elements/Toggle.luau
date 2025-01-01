@@ -1,6 +1,6 @@
 local TweenService, UserInputService = game:GetService("TweenService"), game:GetService("UserInputService")
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
  
 local New = Creator.New
 local Components = Root.Components
@@ -25,7 +25,7 @@ function Element:New(Idx, Config)
 	Toggle.SetTitle = ToggleFrame.SetTitle
 	Toggle.SetDesc = ToggleFrame.SetDesc
 
-	local ToggleCircle: ImageLabel = New("ImageLabel", {
+	local ToggleCircle = New("ImageLabel", {
 		AnchorPoint = Vector2.new(0, 0.5),
 		Size = UDim2.fromOffset(14, 14),
 		Position = UDim2.new(0, 2, 0.5, 0),
@@ -34,7 +34,7 @@ function Element:New(Idx, Config)
 		ThemeTag = {
 			ImageColor3 = "ToggleSlider",
 		},
-	})
+	}) :: ImageLabel
 
 	local ToggleBorder = New("UIStroke", {
 		Transparency = 0.5,
@@ -43,7 +43,7 @@ function Element:New(Idx, Config)
 		},
 	})
 
-	local ToggleSlider: Frame = New("Frame", {
+	local ToggleSlider = New("Frame", {
 		Size = UDim2.fromOffset(36, 18),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -10, 0.5, 0),
@@ -58,7 +58,7 @@ function Element:New(Idx, Config)
 		}),
 		ToggleBorder,
 		ToggleCircle,
-	})
+	}) :: Frame
 
 	function Toggle:OnChanged(Func)
 		Toggle.Changed = Func
@@ -89,8 +89,12 @@ function Element:New(Idx, Config)
 
 		ToggleCircle.ImageTransparency = Toggle.Value and 0 or 0.5
 
-		Library:SafeCallback(Toggle.Callback, Toggle.Value)
-		Library:SafeCallback(Toggle.Changed, Toggle.Value)
+		if typeof(Toggle.Callback) == "function" then
+			Library:SafeCallback(Toggle.Callback, Toggle.Value)
+		end
+		if typeof(Toggle.Changed) == "function" then
+			Library:SafeCallback(Toggle.Changed, Toggle.Value)
+		end
 	end
 
 	function Toggle:Destroy()
@@ -224,9 +228,13 @@ function Element:New(Idx, Config)
 		
 			function Keybind:DoClick()
 				Toggle:SetValue(not Toggle.Value)
-
-				Library:SafeCallback(self.Callback, self.Toggled)
-				Library:SafeCallback(self.Clicked, self.Toggled)
+				
+				if typeof(self.Callback) == "function" then
+					Library:SafeCallback(self.Callback, self.Value)
+				end
+				if typeof(self.Clicked) == "function" then
+					Library:SafeCallback(self.Clicked, self.Value)
+				end
 			end
 		
 			function Keybind:Destroy()

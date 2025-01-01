@@ -1,6 +1,5 @@
 local Root = script.Parent.Parent
 local Components = Root.Components
-local Creator = require(Root.Creator)
 
 local Element = {}
 Element.__index = Element
@@ -13,7 +12,7 @@ function Element:New(Idx, Config)
 
 	local Paragraph = {
 		Value = Config.Content,
-		Callback = Config.Callback or function(Value) end,
+		Callback = Config.Callback or function(Value: string) end,
 		Type = "Paragraph",
 	}
 
@@ -31,7 +30,7 @@ function Element:New(Idx, Config)
 		Library:SafeCallback(Func, Paragraph.Value, Paragraph.Value)
 	end
 
-	function Paragraph:SetValue(Value)
+	function Paragraph:SetContent(Value)
 		Value = Value or ""
 		rawset(Paragraph, "Value", Value)
 
@@ -40,8 +39,16 @@ function Element:New(Idx, Config)
 		ParagraphFrame.Frame.BackgroundTransparency = 0.92
 		ParagraphFrame.Border.Transparency = 0.6
 
-		Library:SafeCallback(Paragraph.Callback, Paragraph.Value)
-		Library:SafeCallback(Paragraph.Changed, Paragraph.Value)
+		if typeof(Paragraph.Callback) == "function" then
+			Library:SafeCallback(Paragraph.Callback, Paragraph.Value)
+		end
+		if typeof(Paragraph.Changed) == "function" then
+			Library:SafeCallback(Paragraph.Changed, Paragraph.Value)
+		end
+	end
+
+	function Paragraph:SetValue(Value)
+		Paragraph:SetContent(Value)
 	end
 
 	function Paragraph:Destroy()

@@ -1,7 +1,7 @@
 local UserInputService = game:GetService("UserInputService")
 
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 
 local New = Creator.New
 local Components = Root.Components
@@ -72,7 +72,7 @@ function Element:New(Idx, Config)
 			},
 		}),
 		KeybindDisplayLabel,
-	})
+	}) :: TextButton
 
 	function Keybind:GetState()
 		if UserInputService:GetFocusedTextBox() and Keybind.Mode ~= "Always" then
@@ -109,8 +109,12 @@ function Element:New(Idx, Config)
 
 		KeybindDisplayLabel.Text = Library.Utilities:Prettify(Keybind.Value)
 
-		Library:SafeCallback(Keybind.ChangedCallback, Key)
-		Library:SafeCallback(Keybind.Changed, Key)
+		if typeof(Keybind.ChangedCallback) == "function" then
+			Library:SafeCallback(Keybind.ChangedCallback, Key)
+		end
+		if typeof(Keybind.Changed) == "function" then
+			Library:SafeCallback(Keybind.Changed, Key)
+		end
 	end
 
 	function Keybind:OnClick(Callback)
@@ -123,8 +127,12 @@ function Element:New(Idx, Config)
 	end
 
 	function Keybind:DoClick()
-		Library:SafeCallback(Keybind.Callback, Keybind.Toggled)
-		Library:SafeCallback(Keybind.Clicked, Keybind.Toggled)
+		if typeof(Keybind.Callback) == "function" then
+			Library:SafeCallback(Keybind.Callback, Keybind.Toggled)
+		end
+		if typeof(Keybind.Clicked) == "function" then
+			Library:SafeCallback(Keybind.Clicked, Keybind.Toggled)
+		end
 	end
 
 	function Keybind:Destroy()

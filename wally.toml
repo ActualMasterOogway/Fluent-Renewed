@@ -1,0 +1,12 @@
+[package]
+name = "actualmasteroogway/fluent-renewed"
+version = "1.0.4"
+license = "MIT"
+authors = ["ActualMasterOogway"]
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+Signal = "lucasmzreal/fastsignal@10.3.2"
+Ripple = "littensy/ripple@0.9.1"
+Flipper = "reselim/flipper@2.0.0"

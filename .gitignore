@@ -1,5 +1,7 @@
-/node_modules
-/.vscode
-/Distribution
-/Assets/Fonts/Touche
-/sourcemap.json
+Distribution
+Packages
+sourcemap.json
+wally.lock
+
+.vscode/*.d.luau
+Assets/Fonts/Touche

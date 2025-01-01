@@ -1,5 +1,5 @@
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
  
 local New = Creator.New
 local Components = Root.Components
@@ -24,10 +24,12 @@ function Element:New(Config)
 		ThemeTag = {
 			ImageColor3 = "Text",
 		}
-	})
+	}) :: ImageLabel
 
 	Creator.AddSignal(ButtonFrame.Frame.MouseButton1Click, function()
-		self.Library:SafeCallback(Config.Callback)
+		if typeof(Config.Callback) == "function" then
+			self.Library:SafeCallback(Config.Callback, Config.Value)
+		end
 	end)
 
 	ButtonFrame.Instance = ButtonFrame

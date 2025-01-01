@@ -1,7 +1,7 @@
 local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
-local Creator = require(Root.Creator)
-local Acrylic = require(Root.Acrylic)
+local Creator = require(Root.Modules.Creator)
+local Acrylic = require(Root.Modules.Acrylic)
 
 local Spring = Flipper.Spring.new
 local Instant = Flipper.Instant.new

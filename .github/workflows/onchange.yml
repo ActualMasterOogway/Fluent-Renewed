@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   build-script:
-    name: Bundle Hub
+    name: Bundle and Upload Fluent Renewed
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,18 +34,20 @@ jobs:
           rokit trust rojo-rbx/rojo
           rokit trust lune-org/lune
           rokit trust seaofvoices/darklua
+          rokit trust UpliftGames/wally
+          rokit trust JohnnyMorganz/wally-package-types
           rokit install
 
-      - name: Bundle
+      - name: Build
         run: lune run Build
 
-      - name: Upload Minified Fluent to Artifacts
+      - name: Upload Minified Fluent Renewed to Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Fluent.luau
           path: Distribution/Fluent.luau
 
-      - name: Upload Fluent Model to Artifacts
+      - name: Upload Fluent Renewed Model to Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Fluent.rbxm

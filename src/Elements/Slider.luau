@@ -1,6 +1,6 @@
 local UserInputService = game:GetService("UserInputService")
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 
 local New = Creator.New
 local Components = Root.Components
@@ -121,7 +121,7 @@ function Element:New(Idx, Config)
 		Library:SafeCallback(Func, Slider.Value, Slider.Value)
 	end
 
-	function Slider:SetValue(Value)
+	function Slider:SetValue(Value: number)
 		local OldValue = self.Value or Value
 
 		rawset(self, "Value", Library.Utilities:Round(math.clamp(Value, Slider.Min, Slider.Max), Slider.Rounding))
@@ -130,8 +130,12 @@ function Element:New(Idx, Config)
 		SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 		SliderDisplay.Text = tostring(self.Value)
 
-		Library:SafeCallback(Slider.Callback, self.Value, OldValue)
-		Library:SafeCallback(Slider.Changed, self.Value, OldValue)
+		if typeof(Slider.ChangedCallback) == "function" then
+			Library:SafeCallback(Slider.Callback, self.Value, OldValue)
+		end
+		if typeof(Slider.Changed) == "function" then
+			Library:SafeCallback(Slider.Changed, self.Value, OldValue)
+		end
 	end
 
 	Creator.AddSignal(UserInputService.InputChanged, function(Input)

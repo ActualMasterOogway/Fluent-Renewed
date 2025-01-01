@@ -3,7 +3,7 @@ local Mouse = game:GetService("Players").LocalPlayer:GetMouse()
 local Camera = game:GetService("Workspace").CurrentCamera
 
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 local Flipper = require(Root.Packages.Flipper)
 
 local New = Creator.New
@@ -116,7 +116,7 @@ function Element:New(Idx, Config)
 		DropdownListLayout,
 	})
 
-	local DropdownHolderFrame: Frame = New("Frame", {
+	local DropdownHolderFrame = New("Frame", {
 		Size = UDim2.fromScale(1, 0.6),
 		ThemeTag = {
 			BackgroundColor3 = "DropdownHolder",
@@ -142,7 +142,7 @@ function Element:New(Idx, Config)
 			ImageColor3 = Color3.fromRGB(0, 0, 0),
 			ImageTransparency = 0.1,
 		}),
-	})
+	}) :: Frame
 
 	local ButtonSelector_BuildList = New("Frame", {
 		Size = UDim2.fromOffset(4, 14),
@@ -156,7 +156,7 @@ function Element:New(Idx, Config)
 		New("UICorner", {
 			CornerRadius = UDim.new(0, 2),
 		}),
-	})
+	}) :: Frame
 
 	local ButtonLabel_BuildList = New("TextLabel", {
 		FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
@@ -172,7 +172,7 @@ function Element:New(Idx, Config)
 		ThemeTag = {
 			TextColor3 = "Text"
 		}
-	})
+	}) :: TextLabel
 
 	local Button_BuildList = New("TextButton", {
 		Size = UDim2.new(1, -5, 0, 32),
@@ -188,7 +188,7 @@ function Element:New(Idx, Config)
 		New("UICorner", {
 			CornerRadius = UDim.new(0, 6),
 		})
-	})
+	}) :: TextButton
 
 	local DropdownHolderCanvas = New("Frame", {
 		BackgroundTransparency = 1,
@@ -413,8 +413,12 @@ function Element:New(Idx, Config)
 						Table:UpdateButton()
 						Dropdown:Display()
 
-						Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
-						Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
+						if typeof(Dropdown.Callback) == "function" then
+							Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
+						end
+						if typeof(Dropdown.Changed) == "function" then
+							Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
+						end
 					end
 				end
 			end)
@@ -482,8 +486,12 @@ function Element:New(Idx, Config)
 
 		Dropdown:BuildDropdownList()
 
-		Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
-		Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
+		if typeof(Dropdown.Callback) == "function" then
+			Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
+		end
+		if typeof(Dropdown.Changed) == "function" then
+			Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
+		end
 	end
 
 	function Dropdown:Destroy()
@@ -501,16 +509,16 @@ function Element:New(Idx, Config)
 			local Indx = table.find(Dropdown.Values, Value)
 
 			if Indx then
-				table.insert(Defaults, Indx)
+				Defaults[#Defaults + 1] = Indx
 			end
 		end
 		table.clear(Config.Default)
 	elseif type(Config.Default) == "number" and Dropdown.Values[Config.Default] ~= nil then
-		table.insert(Defaults, Config.Default)
+		Defaults[#Defaults + 1] = Config.Default
 	else
 		local Indx = table.find(Dropdown.Values, Config.Default)
 		if Indx then
-			table.insert(Defaults, Indx)
+			Defaults[#Defaults + 1] = Indx
 		end
 	end
 

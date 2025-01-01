@@ -223,7 +223,7 @@ MultiDropdown:OnChanged(function(Value)
     local Values = {}
 
     for Value, State in next, Value do
-        table.insert(Values, Value)
+        Values[#Values + 1] = Value
     end
 
     print("Mutlidropdown changed:", table.concat(Values, ", "))
@@ -233,7 +233,7 @@ MultiInstanceDropdown:OnChanged(function(Value)
     local Values = {}
 
     for Value, State in next, Value do
-        table.insert(Values, typeof(Value))
+        Values[#Values + 1] = typeof(Value)
     end
 
     print("Mutlidropdown with instance selection changed:", table.concat(Values, ", "))
@@ -243,7 +243,7 @@ MultiTableDropdown:OnChanged(function(Value)
     local Values = {}
 
     for Value, State in next, Value do
-        table.insert(Values, Value)
+        Values[#Values + 1] = Value
     end
 
     print("Mutlidropdown table displayer thingy idk:", Values)

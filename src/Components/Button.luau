@@ -1,6 +1,6 @@
 local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 local New = Creator.New
 
 local Spring = Flipper.Spring.new

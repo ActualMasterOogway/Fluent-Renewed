@@ -1,4 +1,5 @@
-local Creator = require(script.Parent.Parent.Creator)
+local Root = script.Parent.Parent.Parent
+local Creator = require(Root.Modules.Creator)
 local AcrylicBlur = require(script.Parent.AcrylicBlur)
 
 local New = Creator.New
@@ -107,7 +108,7 @@ return function(props)
 
 	local Blur
 
-	if require(script.Parent.Parent).UseAcrylic then
+	if require(Root).UseAcrylic then
 		Blur = AcrylicBlur()
 		Blur.Frame.Parent = AcrylicPaint.Frame
 		AcrylicPaint.Model = Blur.Model

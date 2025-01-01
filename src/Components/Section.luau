@@ -1,5 +1,5 @@
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 
 local New = Creator.New
 

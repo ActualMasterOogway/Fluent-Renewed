@@ -1,6 +1,7 @@
-local Root = script.Parent
+local Root = script.Parent.Parent
 local Themes = require(Root.Themes)
-local Flipper = require(Root.Packages.Flipper)
+local Flipper, Ripple = require(Root.Packages.Flipper), require(Root.Packages.Ripple)
+local Signal = require(Root.Packages.Signal)
 
 local Creator = {
 	Registry = {},
@@ -29,6 +30,7 @@ local Creator = {
 			TextColor3 = Color3.new(0, 0, 0),
 			BackgroundTransparency = 1,
 			TextSize = 14,
+			RichText = true,
 		},
 		TextButton = {
 			BackgroundColor3 = Color3.new(1, 1, 1),
@@ -38,6 +40,7 @@ local Creator = {
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
 			TextSize = 14,
+			RichText = true,
 		},
 		TextBox = {
 			BackgroundColor3 = Color3.new(1, 1, 1),
@@ -47,6 +50,7 @@ local Creator = {
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
 			TextSize = 14,
+			RichText = true,
 		},
 		ImageLabel = {
 			BackgroundTransparency = 1,
@@ -67,24 +71,27 @@ local Creator = {
 	},
 	Theme = {
 		Updating = false,
-		Updated = Flipper.Signal.new(),
+		Updated = Signal.new()
 	}
 }
 
-local function ApplyCustomProps(Object, Props)
-	if Props.ThemeTag then
+local function ApplyCustomProps(Object, Props: { [string]: any }?)
+	if typeof(Props) == "table" and Props.ThemeTag then
 		Creator.AddThemeObject(Object, Props.ThemeTag)
 	end
 end
 
-function Creator.AddSignal(Signal, Function)
+function Creator.AddSignal(Signal: RBXScriptSignal, Function)
 	Creator.Signals[#Creator.Signals+1] = Signal:Connect(Function)
 end
 
 function Creator.Disconnect()
 	for Idx = #Creator.Signals, 1, -1 do
 		local Connection = table.remove(Creator.Signals, Idx)
-		Connection:Disconnect()
+		
+		if Connection then
+			Connection:Disconnect()
+		end
 	end
 end
 
@@ -135,7 +142,7 @@ function Creator.UpdateTheme(RegistryIndex: Instance?)
 		end
 	end	
 
-	for Idx, Motor in next, Creator.TransparencyMotors do
+	for Idx: number, Motor in next, Creator.TransparencyMotors do
 		if Idx % 135 == 0 then
 			task.wait()
 		end
@@ -147,7 +154,7 @@ function Creator.UpdateTheme(RegistryIndex: Instance?)
 	Creator.Theme.Updated:Fire()
 end
 
-function Creator.AddThemeObject(Object, Properties)
+function Creator.AddThemeObject(Object: Instance, Properties:{ [string]: any })
 	local Idx = #Creator.Registry + 1
 	local Data = {
 		Object = Object,
@@ -166,7 +173,7 @@ function Creator.OverrideTag(Object, Properties)
 	Creator.UpdateTheme(Object)
 end
 
-function Creator.New(Name, Properties, Children)
+function Creator.New(Name, Properties: { [string]: any }?, Children: { [number]: Instance }?): Instance
 	local Object = Instance.new(Name)
 
 	-- Default properties
@@ -200,10 +207,10 @@ function Creator.SpringMotor(Initial, Instance, Prop, IgnoreDialogCheck, ResetOn
 	end)
 
 	if ResetOnThemeChange then
-		table.insert(Creator.TransparencyMotors, Motor)
+		Creator.TransparencyMotors[#Creator.TransparencyMotors + 1] = Motor
 	end
 
-	local function SetValue(Value, Ignore)
+	local function SetValue(Value, Ignore: boolean?)
 		Ignore = Ignore or false
 		if not IgnoreDialogCheck then
 			if not Ignore then

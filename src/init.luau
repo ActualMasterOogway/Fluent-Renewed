@@ -6,23 +6,23 @@ local function Clone<Original>(ToClone: any & Original): (Original, boolean)
 	elseif Type == "Instance" and (cloneref or clonereference) then
 		return (cloneref or clonereference)(ToClone), true
 	elseif Type == "table" then
-		local function deepcopy(orig, copies)
-			copies = copies or {}
+		local function deepcopy(orig, copies: { [any]: any }?)
+			local Copies = copies or {}
 			local orig_type, copy = typeof(orig), nil
 
 			if orig_type == 'table' then
-				if copies[orig] then
-					copy = copies[orig]
+				if Copies[orig] then
+					copy = Copies[orig]
 				else	
 					copy = {}
 
-					copies[orig] = copy
+					Copies[orig] = copy
 
 					for orig_key, orig_value in next, orig, nil do
-						copy[deepcopy(orig_key, copies)] = deepcopy(orig_value, copies)
+						copy[deepcopy(orig_key, Copies)] = deepcopy(orig_value, Copies)
 					end
 
-					(setrawmetatable or setmetatable)(copy, deepcopy((getrawmetatable or getmetatable)(orig), copies))
+					(setrawmetatable or setmetatable)(copy, deepcopy((getrawmetatable or getmetatable)(orig), Copies))
 				end
 			elseif orig_type == 'Instance' or orig_type == 'function' then
 				copy = Clone(orig)
@@ -48,12 +48,12 @@ local GuiService = Clone(game:GetService("GuiService"))
 local Root = script
 local Components = Root.Components
 
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 local ElementsTable = require(Root.Elements)
-local Acrylic = require(Root.Acrylic)
-local Icons = require(Root.Icons)
+local Acrylic = require(Root.Modules.Acrylic)
+local Icons = require(Root.Modules.Icons)
 local Themes = require(Root.Themes)
-local Signal = require(Root.Packages.Flipper.Signal)
+local Signal = require(Root.Packages.Signal)
 
 local NotificationModule = require(Components.Notification)
 
@@ -64,7 +64,7 @@ local BaseContainer = New("ScreenGui", {
 	Name = "Fluent Renewed Base GUI"
 })
 
-BaseContainer.Parent = (function()
+BaseContainer.Parent = (function() -- https://github.com/Pepsied-5229/Pepsi-UI-Library/blob/main/Pepsi-UI-Library.lua#L503
 	local success, result = pcall(function()
 		return (gethui or get_hidden_ui)()
 	end)
@@ -105,7 +105,7 @@ BaseContainer.Parent = (function()
 		return result
 	end
 
-	return error("Seriously bad engine. Can't find a place to store the GUI. Robust code can't help this much incompetence.")
+	return error("Seriously bad engine. Can't find a place to store the GUI. Robust code can't help this much incompetence.", 0)
 end)()
 
 SharedTable.FluentRenewed = SharedTable.FluentRenewed or {}
@@ -113,7 +113,7 @@ SharedTable.FluentRenewed = SharedTable.FluentRenewed or {}
 NotificationModule:Init(BaseContainer)
 
 local Library = {
-	Version = "1.0.2",
+	Version = "1.0.4",
 
 	OpenFrames = {},
 	Options = {},
@@ -146,36 +146,32 @@ local Library = {
 }
 
 function Library:SafeCallback(Function, ...)
-	if typeof(Function) ~= "function" then
-		return
-	end
+	assert(typeof(Function) == "function", debug.traceback(`Library:SafeCallback expects type 'function' at Argument #1, got '{typeof(Function)}'`, 2))
 
-	local Args = {...}
-
-	task.spawn(function()
-		local Success, Event = pcall(Function, table.unpack(Args))
+	task.spawn(function(...)
+		local Success, Event = pcall(Function, ...)
 
 		if not Success then
 			local _, i = Event:find(":%d+: ")
 	
-			task.defer(error, debug.traceback(Event))
+			task.defer(error, debug.traceback(Event, 2))
 	
 			Library:Notify({
 				Title = "Interface",
 				Content = "Callback error",
-				SubContent = not i and Event or Event:sub(i + 1),
+				SubContent = if typeof(i) == "number" then Event:sub(i + 1) else Event,
 				Duration = 5,
 			})
 		end
-	end)
+	end, ...)
 end
 
-function Library.Utilities:Resize(x: number, y: number)
-    local X, Y, CurrentSize = x / 1920, y / 1080, Camera.ViewportSize
-    return CurrentSize.X * X, CurrentSize.Y * Y
+function Library.Utilities:Resize(X: number, Y: number): (number, number)
+    local x, y, CurrentSize = X / 1920, Y / 1080, Camera.ViewportSize
+    return CurrentSize.X * x, CurrentSize.Y * y
 end
 
-function Library.Utilities:Truncate(number: number, decimals: number, round: boolean)
+function Library.Utilities:Truncate(number: number, decimals: number, round: boolean): number
 	local shift = 10 ^ (typeof(decimals) == "number" and math.max(decimals, 0) or 0)
 
 	if round then
@@ -185,29 +181,28 @@ function Library.Utilities:Truncate(number: number, decimals: number, round: boo
 	end
 end
 
-function Library.Utilities:Round(Number: number, Factor: number)
+function Library.Utilities:Round(Number: number, Factor: number): number
 	return Library.Utilities:Truncate(Number, Factor, true)
 end
 
-function Library.Utilities:GetIcon(Name: string)
+function Library.Utilities:GetIcon(Name: string): { Image: string, ImageRectSize: Vector2, ImageRectOffset: Vector2 }
 	return Name ~= "SetIcon" and Icons[Name] or nil
 end
 
-function Library.Utilities:Prettify(ToPrettify: EnumItem & string & number)
-	local Type = typeof(ToPrettify)
+function Library.Utilities:Prettify(ToPrettify: EnumItem & string & number): string | number
 
-	if Type == "EnumItem" then
-		return ToPrettify.Name:gsub("(%l)(%u)", "%1 %2")
-	elseif Type == "string" then
-		return ToPrettify:gsub("(%l)(%u)", "%1 %2")
-	elseif Type == "number" then
+	if typeof(ToPrettify) == "EnumItem" then
+		return ({ToPrettify.Name:gsub("(%l)(%u)", "%1 %2")})[1]
+	elseif typeof(ToPrettify) == "string" then
+		return ({ToPrettify:gsub("(%l)(%u)", "%1 %2")})[1]
+	elseif typeof(ToPrettify) == "number" then
 		return Library.Utilities:Round(ToPrettify, 2)
 	else
-		return ToPrettify
+		return tostring(ToPrettify)
 	end
 end
 
-function Library.Utilities:Clone<Original>(ToClone: {[any]: any} & ((...any) -> ...any) & Object & Original): (Original, boolean)
+function Library.Utilities:Clone<Original>(ToClone: {[any]: any} & (...any) -> (...any) & Object & Original): (Original, boolean)
 	return Clone(ToClone)
 end
 
@@ -217,7 +212,7 @@ function Library.Utilities:GetOS()
 	if GuiService:IsTenFootInterface() then
 		local L2Button_Name = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonL2)
 
-		OSName = L2Button_Name == "ButtonLT" and "Xbox" or L2Button_Name == "ButtonL2" and "PlayStation"
+		OSName = if L2Button_Name == "ButtonLT" then "Xbox" elseif L2Button_Name == "ButtonL2" then "PlayStation" else "Console"
 	elseif GuiService.IsWindows then
 		OSName = "Windows"
 	elseif version():find("^0.") == 1 then
@@ -251,26 +246,38 @@ end
 
 Library.Elements = Elements
 
-function Library:Window(Config)
-	if Library.CreatedWindow then
-		return "You cannot create more than one window."
-	end
+function Library:Window(Config: {
+		Title: string?,
+		SubTitle: string?,
+		TabWidth: number?,
+		MinSize: Vector2?,
+		Size: UDim2?,
+		Resize: boolean?,
+		MinimizeKey: Enum.KeyCode?,
+		Acrylic: boolean?,
+		Theme: string?,
+		Mobile: {
+			GetIcon: (IsMinimized: boolean) -> { Image: string, ImageRectOffset: Vector2, ImageRectSize: Vector2 },
+			Size: UDim2
+		}?
+	})
+	assert(Library.CreatedWindow == nil, debug.traceback("You cannot create more than one window.", 2))
 
 	if not Config.Title then
-		local Success, Game_Name = pcall(MarketplaceService.GetProductInfo, MarketplaceService, game.PlaceId)
+		local Success, Game_Info = pcall(MarketplaceService.GetProductInfo, MarketplaceService, game.PlaceId)
 		
-		Config.Title = Success and Game_Name or "Fluent Renewed"
+		Config.Title = Success and Game_Info.Name or "Fluent Renewed"
 	end
 
-	Config.MinSize = Config.MinSize or Vector2.new(470, 380)
+	Config.MinSize = if typeof(Config.MinSize) == "Vector2" then Config.MinSize else Vector2.new(470, 380)
 
-	Config.Size = Config.Resize ~= true and Config.Size or UDim2.fromOffset(Library.Utilities:Resize(Config.Size.X.Offset, Config.Size.Y.Offset))
-	Config.MinSize = Config.Resize ~= true and Config.MinSize or Vector2.new(Library.Utilities:Resize(Config.MinSize.X, Config.MinSize.Y))
+	Config.Size = if Config.Resize ~= true then Config.Size else UDim2.fromOffset(Library.Utilities:Resize((Config.Size and Config.Size.X.Offset) or 470, (Config.Size and Config.Size.Y.Offset) or 380))
+	Config.MinSize = if Config.Resize ~= true then Config.MinSize else Vector2.new(Library.Utilities:Resize((Config.MinSize and Config.MinSize.X) or 470, (Config.MinSize and Config.MinSize.Y) or 380))
 
-	Library.MinimizeKey = Config.MinimizeKey or Enum.KeyCode.LeftControl
-	Library.UseAcrylic = Config.Acrylic or false
-	Library.Acrylic = Config.Acrylic or false
-	Library.Theme = Config.Theme or "Vynixu"
+	Library.MinimizeKey = if typeof(Config.MinimizeKey) == "string" or typeof(Config.MinimizeKey) == "EnumItem" and Config.MinimizeKey.EnumType == Enum.KeyCode then Config.MinimizeKey else Enum.KeyCode.LeftControl
+	Library.UseAcrylic = if typeof(Config.Acrylic) == "boolean" then Config.Acrylic else false
+	Library.Acrylic = if typeof(Config.Acrylic) == "boolean" then Config.Acrylic else false
+	Library.Theme = if typeof(Config.Theme) == "string" then Config.Theme else "Vynixu"
 
 	if Config.Acrylic then
 		Acrylic.init()
@@ -298,7 +305,7 @@ function Library:Window(Config)
 	BaseContainer.Name = `FluentRenewed_{Config.Title}`
 
 	Library.CreatedWindow = Window
-	Library:SetTheme(Config.Theme)
+	Library:SetTheme(Library.Theme)
 
 	return Window
 end
@@ -340,9 +347,9 @@ function Library:Destroy()
 			end
 		end
 
-		local info, tweenProps, doTween = TweenInfo.new(2 / 3, Enum.EasingStyle.Quint)
+		local info, tweenProps, doTween = TweenInfo.new(2 / 3, Enum.EasingStyle.Quint), {}, false
 
-		local function IsA(obj, class)
+		local function IsA(obj: Object, class: string)
 			local isClass = obj:IsA(class)
 
 			if isClass then
@@ -353,11 +360,9 @@ function Library:Destroy()
 		end
 
 		for i,v in next, Library.GUI:GetDescendants() do
-			tweenProps, doTween = {}, false
+			table.clear(tweenProps)
 
 			if IsA(v, "GuiObject") then
-				doTween = true
-
 				tweenProps.BackgroundTransparency = 1
 			end
 
@@ -379,6 +384,7 @@ function Library:Destroy()
 			end
 
 			if doTween then
+				doTween = false
 				TweenService:Create(v, info, tweenProps):Play()
 			end
 		end
@@ -391,7 +397,7 @@ function Library:Destroy()
 	end
 end
 
-function Library:ToggleAcrylic(Value)
+function Library:ToggleAcrylic(Value: boolean)
 	if Library.CreatedWindow then
 		if Library.UseAcrylic then
 			Library.Acrylic = Value
@@ -405,7 +411,7 @@ function Library:ToggleAcrylic(Value)
 	end
 end
 
-function Library:ToggleTransparency(Value)
+function Library:ToggleTransparency(Value: boolean)
 	if Library.CreatedWindow then
 		Library.CreatedWindow.AcrylicPaint.Frame.Background.BackgroundTransparency = Value and 0.35 or 0
 	end

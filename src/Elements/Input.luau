@@ -1,5 +1,5 @@
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 
 local AddSignal = Creator.AddSignal
 local Components = Root.Components
@@ -50,8 +50,12 @@ function Element:New(Idx, Config)
 		rawset(Input, "Value", Text)
 		Box.Text = Text
 
-		Library:SafeCallback(Input.Callback, Input.Value)
-		Library:SafeCallback(Input.Changed, Input.Value)
+		if typeof(Input.Callback) == "function" then
+			Library:SafeCallback(Input.Callback, Input.Value)
+		end
+		if typeof(Input.Changed) == "function" then
+			Library:SafeCallback(Input.Changed, Input.Value)
+		end
 	end
 
 	if Input.Finished then

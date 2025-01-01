@@ -1,7 +1,7 @@
 local Root = script.Parent.Parent
-local Creator = require(Root.Creator)
+local Creator = require(Root.Modules.Creator)
 local Button_Component = require(Root.Components.Button)
-local Signal = require(Root.Packages.Flipper.Signal)
+local Signal = require(Root.Packages.Signal)
 
 local New = Creator.New
 

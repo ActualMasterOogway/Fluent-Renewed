@@ -150,7 +150,8 @@ elseif Subcommand == "bundle" then
     local Options = ParseArgs(CommandArgs, {
         -- Option = {Type, DefaultValue, IsRequired?}
         ["input"] = {"string", "default.project.json"},
-        ["output"] = {"string", "Distribution/Script.luau"},
+        ["script-output"] = {"string", "Distribution/Fluent.luau"},
+        ["model-output"] = {"string", "Distribution/Fluent.rbxm"},
         ["minify"] = {"boolean", false},
         ["env-name"] = {"string", "Fluent Renewed"},
         ["darklua-config-path"] = {"string", "Lune/Build/DarkLua Config.json"},
@@ -213,7 +214,7 @@ elseif Subcommand == "bundle" then
     if not fs.isFile(Input) then
         Log.Error(`Failed to find file path "{Input}" from \`input\` option\n`)
         print(DirectionToHelp)
-        process.exit(1)
+        return process.exit(1)
     end
 
     local InputDirectory = StringUtils.DirectoryOfFilePath(Input) or ""
@@ -230,14 +231,14 @@ elseif Subcommand == "bundle" then
     if not InputType then
         Log.Error(`Invalid file type ".{StringUtils.FileType(Input)}" for \`input\`, expected [".rbxm", ".rbxmx", ".project.json"]\n`)
         print(DirectionToHelp)
-        process.exit(1)
+        return process.exit(1)
     end
 
     -- `output` option handling:
 
-    local Output = Options["output"]
+    local ScriptOutput, ModelOutput = Options["script-output"] :: string, Options["model-output"] :: string
 
-    if not Output then
+    if not ScriptOutput then
         local NewOutputBase
 
         if InputType == ".project.json" then
@@ -245,7 +246,7 @@ elseif Subcommand == "bundle" then
 
             if not ParseSuccess then
                 Log.Error(`Failed to parse Rojo project file at "{Input}": {ErrorOrParsed}`)
-                process.exit(1)
+                return process.exit(1)
             end
 
             if not ErrorOrParsed.name or type(ErrorOrParsed.name) ~= "string" then
@@ -261,43 +262,43 @@ elseif Subcommand == "bundle" then
         end
         
         if not NewOutputBase then
-            Log.InternalError(`Failed to get file path without the extension for "{Output}"`)
-            process.exit(1)
+            Log.InternalError(`Failed to get file path without the extension for "{ScriptOutput}"`)
+            return process.exit(1)
         end
 
         NewOutputBase ..= ".wax.lua"
-        Output = InputDirectory .. NewOutputBase
+        ScriptOutput = InputDirectory .. NewOutputBase
     else
-        local OutputFileType = StringUtils.FileType(Output)
-        local DirectoryOfOutput = StringUtils.DirectoryOfFilePath(Output)
+        local OutputFileType = StringUtils.FileType(ScriptOutput)
+        local DirectoryOfOutput = StringUtils.DirectoryOfFilePath(ScriptOutput)
 
         if not DirectoryOfOutput then
-            Log.Error(`\`output\` file path given, "{Output}" not a valid path\n`)
+            Log.Error(`\`output\` file path given, "{ScriptOutput}" not a valid path\n`)
             print(DirectionToHelp)
-            process.exit(1)
+            return process.exit(1)
         elseif not fs.isDir(DirectoryOfOutput) then
             Log.Error(`Directory of \`output\` file path given, "{DirectoryOfOutput}" not found/invalid\n`)
             print(DirectionToHelp)
-            process.exit(1)
+            return process.exit(1)
         elseif not OutputFileType or not table.find({"lua", "luau"}, OutputFileType) then
             local FileTypeDisplay = if OutputFileType == "" then "<empty>" else "." .. OutputFileType
 
             Log.Error(`File type of \`output\` ({FileTypeDisplay}) invalid, expected [".lua", ".luau"]\n`)
             print(DirectionToHelp)
-            process.exit(1)
+            return process.exit(1)
         end
     end
 
-    local OutputFileName = StringUtils.FileNameFromPath(Output)
-    if not OutputFileName then
-        Log.InternalError(`Failed to parse file name from output file path "{Output}"`)
-        process.exit(1)
+    local ScriptOutputFileName = StringUtils.FileNameFromPath(ScriptOutput)
+    if typeof(ScriptOutputFileName) ~= "string" then
+        Log.InternalError(`Failed to parse file name from output file path "{ScriptOutput}"`)
+        return process.exit(1)
     end
 
-    local OutputFileNameWithoutExtension = StringUtils.FileNameWithoutExtension(OutputFileName, false)
-    if not OutputFileNameWithoutExtension then
-        Log.InternalError(`Failed to parse file name without its extension from "{OutputFileName}"`)
-        process.exit(1)
+    local ScriptOutputFileNameWithoutExtension = StringUtils.FileNameWithoutExtension(ScriptOutputFileName, false)
+    if not ScriptOutputFileNameWithoutExtension then
+        Log.InternalError(`Failed to parse file name without its extension from "{ScriptOutputFileName}"`)
+        return process.exit(1)
     end
 
     -- `darklua-config-path` option handling:
@@ -306,7 +307,7 @@ elseif Subcommand == "bundle" then
 
     if DarkluaConfigPath and not fs.isFile(DarkluaConfigPath) then
         Log.Error(`File path given for \`darklua-config-path\`, "{DarkluaConfigPath}" not found`)
-        process.exit(1)
+        return process.exit(1)
     end
 
     -- `temp-dir-base` option handling:
@@ -314,11 +315,11 @@ elseif Subcommand == "bundle" then
     local TempDirBase = Options["temp-dir-base"]
 
     if not TempDirBase then
-        TempDirBase = StringUtils.DirectoryOfFilePath(Output)
+        TempDirBase = StringUtils.DirectoryOfFilePath(ScriptOutput)
     elseif not fs.isDir(TempDirBase) then
         Log.Error(`\`temp-dir-base\` directory given, "{TempDirBase}" not found/invalid\n`)
         print(DirectionToHelp)
-        process.exit(1)
+        return process.exit(1)
     end
 
     if not string.match(TempDirBase, "[/\\]$") then
@@ -338,7 +339,7 @@ elseif Subcommand == "bundle" then
     if ExtraOffsetLines < 0 then
         Log.Error(`Option \`extra-offset-lines\` ({ExtraOffsetLines}) cannot be less than 0\n`)
         print(DirectionToHelp)
-        process.exit(1)
+        return process.exit(1)
     end
     if not Minify and ExtraOffsetLines > 0 then
         RunIfVerbose(Log.Info, `(Note) Runtime line debugging *will* display with the assumption that \`{ExtraOffsetLines}\` lines will be added to the output by you manually; make sure this is EXACT, as debugging info could be inaccurate otherwise`)
@@ -357,14 +358,14 @@ elseif Subcommand == "bundle" then
             RemoveDir(TempDir)
         end
 
-        process.exit(1)
+        return process.exit(1)
     end
 
     -- Check for necessary commands
     if InputType == ".project.json" and not CommandUtils.CommandExists("rojo") then
         Log.Error(`Rojo project file given for input ("{Input}"), but the \`rojo\` command wasn't found in your PATH environment variable..\n`)
         print(DirectionToHelp)
-        process.exit(1)
+        return process.exit(1)
     end
 
     local DarkluaBinaryExists = CommandUtils.CommandExists("darklua")
@@ -406,7 +407,7 @@ elseif Subcommand == "bundle" then
         -- Here, it's just the ModelRoot return ofc
         ModelRoot = ModelRootOrError
     elseif InputType == ".project.json" then -- Rojo project file
-        local ModelOutputFileName = TempDir .. OutputFileNameWithoutExtension .. ".o.rbxm"
+        local ModelOutputFileName = TempDir .. ScriptOutputFileNameWithoutExtension .. ".o.rbxm"
         RunIfVerbose(Log.Info, `Building from Rojo project file to "{ModelOutputFileName}"`)
 
         Run(
@@ -420,8 +421,10 @@ elseif Subcommand == "bundle" then
             BadExit -- Run() has an option to provide an err handler ourselves
         )
 
-        ModelRoot = roblox.deserializeModel(fs.readFile(ModelOutputFileName))
-        RemoveFile(ModelOutputFileName) -- Remove temporary rbxm
+        local ModelContents = fs.readFile(ModelOutputFileName)
+
+        ModelRoot = roblox.deserializeModel(ModelContents)
+        fs.writeFile(ModelOutput, ModelContents) -- Remove temporary rbxm
     end
 
     local BundleSuccess, CodegenOutputOrError, FailedCompilations = pcall(BundleModel, ModelRoot, EnvName, Minify, ExtraOffsetLines, Verbose)
@@ -431,7 +434,7 @@ elseif Subcommand == "bundle" then
     end
 
     if Minify and DarkluaBinaryExists then
-        local TempOutputFilePath = TempDir .. OutputFileName
+        local TempOutputFilePath = TempDir .. ScriptOutputFileName
         WriteFile(TempOutputFilePath, CodegenOutputOrError)
 
         RunIfVerbose(Log.Info, "Starting minification process with Darklua")
@@ -455,7 +458,7 @@ elseif Subcommand == "bundle" then
         Run("darklua", {
             "process",
             EncodeShellData(TempOutputFilePath),
-            EncodeShellData(Output),
+            EncodeShellData(ScriptOutput),
             unpack(ExtraDarkluaProcessArgs),
         })
 
@@ -465,11 +468,11 @@ elseif Subcommand == "bundle" then
         end
     else
         -- Just write directly
-        WriteFile(Output, CodegenOutputOrError)
+        WriteFile(ScriptOutput, CodegenOutputOrError)
     end
 
     if Header then
-        fs.writeFile(Output, `{Header}\n\n{fs.readFile(Output)}`)
+        fs.writeFile(ScriptOutput, `{Header}\n\n{fs.readFile(ScriptOutput)}`)
     end
 
     -- We're now completely finished!
@@ -482,10 +485,10 @@ elseif Subcommand == "bundle" then
         print()
         Log.Warn(`WARNING: {FailedCompilations} scripts failed to compile ahead-of-time (CHECK FULL BUILD LOG ABOVE FOR MORE DETAILS); these will throw errors at runtime upon being loaded, detailing said compilation errors.`)
 
-        process.exit(1)
+        return process.exit(1)
     end
 else
     Log.Error(`Subcommand "{Subcommand}" invalid, see usage for all valid subcommands:\n`)
     print(UsageMessage)
-    process.exit(1)
+    return process.exit(1)
 end

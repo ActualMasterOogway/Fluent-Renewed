@@ -64,15 +64,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="${{ github.event.inputs.version }}"
-          VERSION_HYPHEN="${VERSION// /-}"
-          gh release upload "v${VERSION_HYPHEN}" "Distribution/Fluent.luau"
+          $version = "${{ github.event.inputs.version }}"
+          $versionHyphen = $version -replace " ", "-"
+          gh release upload "v$versionHyphen" "Distribution/Fluent.luau"
+        shell: pwsh
       
       - name: Upload Fluent Renewed Model to Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload v${{ github.event.inputs.version }} "Distribution/Fluent.rbxm"
+          $version = "${{ github.event.inputs.version }}"
+          $versionHyphen = $version -replace " ", "-"
+          gh release upload "v$versionHyphen" "Distribution/Fluent.rbxm"
+        shell: pwsh
 
       - name: Upload Fluent Renewed Model to Artifacts
         uses: actions/upload-artifact@v4

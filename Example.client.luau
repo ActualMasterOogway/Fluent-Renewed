@@ -72,6 +72,14 @@ Tabs.Main:Button({
     end
 })
 
+Tabs.Main:Button({
+    Title = "Button but with an error",
+    Description = "Not a important button",
+    Callback = function()
+        print("Hello, "..tonumber("World").."!")
+    end
+})
+
 local Toggle = Tabs.Main:Toggle("Toggle", {Title = "Toggle", Default = false })
 
 local Slider = Tabs.Main:Slider("Slider", {

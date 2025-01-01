@@ -15,7 +15,6 @@ function Element:New(Config)
 	local ButtonFrame = require(Components.Element)(Config.Title, Config.Description, self.Container, true)
 
 	local ButtonIco = New("ImageLabel", {
-		Image = "rbxassetid://10709791437",
 		Size = UDim2.fromOffset(16, 16),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -10, 0.5, 0),
@@ -25,6 +24,8 @@ function Element:New(Config)
 			ImageColor3 = "Text",
 		}
 	}) :: ImageLabel
+
+	self.Library.Utilities.Icons:SetIcon(ButtonIco, "chevron-right")
 
 	Creator.AddSignal(ButtonFrame.Frame.MouseButton1Click, function()
 		if typeof(Config.Callback) == "function" then

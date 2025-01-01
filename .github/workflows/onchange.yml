@@ -7,12 +7,14 @@ on:
       - '**.lua'
       - '**.rbxm'
       - '**.json'
+      - '**.yml'
   pull_request:
     paths:
       - '**.luau'
       - '**.lua'
       - '**.rbxm'
       - '**.json'
+      - '**.yml'
 
 permissions:
   contents: write

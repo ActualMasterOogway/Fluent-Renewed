@@ -22,7 +22,7 @@
 			"rule": "rename_variables",
 			"include_functions": true,
 			"globals": [
-				"$default", 
+				"$default",
 				"$roblox",
 				"UIL_Debug"
 			]

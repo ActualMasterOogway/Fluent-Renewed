@@ -5,20 +5,23 @@ local process = require("@lune/process")
 local CommandUtils = {}
 
 function CommandUtils.CommandExists(binary: string): boolean
-    if process.os ~= "windows" then
-        -- Unix-compliance is simple!
-        return process.spawn("type", {binary}, {shell = true}).ok -- Return from status code directly
-    end
+	if process.os ~= "windows" then
+		-- Unix-compliance is simple!
+		return process.spawn("type", { binary }, { shell = true }).ok -- Return from status code directly
+	end
 
-    -- I hate Windows
-    return true
+	-- I hate Windows
+	return true
 end
 
-function CommandUtils.CheckCommands(requiredCommands: {string})
-    -- Check required commands to continue script exec
-    for _, Command in requiredCommands do
-        assert(CommandUtils.CommandExists(Command), `Required command "{Command}" no found in your PATH environment variable, is it not installed?`)
-    end
+function CommandUtils.CheckCommands(requiredCommands: { string })
+	-- Check required commands to continue script exec
+	for _, Command in requiredCommands do
+		assert(
+			CommandUtils.CommandExists(Command),
+			`Required command "{Command}" no found in your PATH environment variable, is it not installed?`
+		)
+	end
 end
 
 return CommandUtils

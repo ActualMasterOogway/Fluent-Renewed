@@ -2,21 +2,21 @@
 
 local fs = require("@lune/fs")
 
-local function RecursiveReadDir(directory: string, _existingFileList: {string}?): {string}
-    if not string.match(directory, "[/\\]$") then
-        directory ..= "/"
-    end
+local function RecursiveReadDir(directory: string, _existingFileList: { string }?): { string }
+	if not string.match(directory, "[/\\]$") then
+		directory ..= "/"
+	end
 
-    local FileList = _existingFileList or {}
-    for _, EntryName in fs.readDir(directory) do
-        if fs.isFile(EntryName) then
-            table.insert(FileList, directory .. EntryName)
-        else -- Is dir
-            RecursiveReadDir(directory .. EntryName .. "/", FileList)
-        end
-    end
+	local FileList = _existingFileList or {}
+	for _, EntryName in fs.readDir(directory) do
+		if fs.isFile(EntryName) then
+			table.insert(FileList, directory .. EntryName)
+		else -- Is dir
+			RecursiveReadDir(directory .. EntryName .. "/", FileList)
+		end
+	end
 
-    return FileList
+	return FileList
 end
 
 return RecursiveReadDir

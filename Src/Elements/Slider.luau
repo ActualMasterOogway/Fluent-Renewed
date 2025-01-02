@@ -130,7 +130,7 @@ function Element:New(Idx, Config)
 		SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 		SliderDisplay.Text = tostring(self.Value)
 
-		if typeof(Slider.ChangedCallback) == "function" then
+		if typeof(Slider.Callback) == "function" then
 			Library:SafeCallback(Slider.Callback, self.Value, OldValue)
 		end
 		if typeof(Slider.Changed) == "function" then

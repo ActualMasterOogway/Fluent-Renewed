@@ -408,6 +408,31 @@ elseif Subcommand == "bundle" then
 			false,
 			BadExit -- Run() has an option to provide an err handler ourselves
 		)
+
+		if not CIMode and CommandUtils.CommandExists("wally-package-types") and CommandUtils.CommandExists("rojo") then
+			Run(
+				"rojo",
+				{
+					"sourcemap",
+					"default.project.json",
+					"--output",
+					"sourcemap.json",
+				},
+				false,
+				BadExit -- Run() has an option to provide an err handler ourselves
+			)
+
+			Run(
+				"wally-package-types",
+				{
+					"--sourcemap",
+					"sourcemap.json",
+					"Packages/",
+				},
+				false,
+				BadExit -- Run() has an option to provide an err handler ourselves
+			)
+		end
 	end
 
 	if table.find({ ".rbxm", ".rbxmx" }, InputType) then -- Roblox model file (direct)

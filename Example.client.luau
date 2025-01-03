@@ -163,6 +163,17 @@ local MultiTableDropdown = Tabs.Main:Dropdown("MultiInstanceDropdown", {
     Default = {}
 })
 
+local AutoDeselectDropdown = Tabs.Main:Dropdown("Dropdown", {
+    Title = "Dropdown",
+    Values = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen"},
+    Multi = false,
+    Default = 1,
+    AutoDeselect = true,
+    Callback = function(Value)
+        print(Value)
+    end
+})
+
 local Colorpicker = Tabs.Main:Colorpicker("Colorpicker", {
     Title = "Colorpicker",
     Default = Color3.fromRGB(96, 205, 255)

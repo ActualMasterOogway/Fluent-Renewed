@@ -28,6 +28,7 @@ function Element:New(Idx, Config)
 		end)(),
 		Value = Config.Default or Config.Value,
 		Multi = Config.Multi or false,
+		AutoDeselect = Config.AutoDeselect or false,
 		Displayer = Config.Displayer or function(Value)
 			return typeof(Value) ~= "number" and tostring(Library.Utilities:Prettify(Value)) or Value
 		end,

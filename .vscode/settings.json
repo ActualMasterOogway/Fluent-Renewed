@@ -1,5 +1,5 @@
 {
-    "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
+    "luau-lsp.sourcemap.rojoProjectFile": "place.project.json",
     "luau-lsp.sourcemap.enabled": true,
     "luau-lsp.types.definitionFiles": [".vscode/exploitTypes.d.luau"], // ur never getting this file, sorry
     "luau-lsp.types.robloxSecurityLevel": "RobloxScriptSecurity",

@@ -113,7 +113,7 @@ SharedTable.FluentRenewed = SharedTable.FluentRenewed or {}
 NotificationModule:Init(BaseContainer)
 
 local Library = {
-	Version = "1.0.4",
+	Version = "1.0.5",
 
 	OpenFrames = {},
 	Options = {},

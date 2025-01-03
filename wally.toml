@@ -1,6 +1,6 @@
 [package]
 name = "actualmasteroogway/fluent-renewed"
-version = "1.0.4"
+version = "1.0.5"
 license = "MIT"
 authors = ["ActualMasterOogway"]
 registry = "https://github.com/UpliftGames/wally-index"

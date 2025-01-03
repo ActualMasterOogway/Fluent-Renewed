@@ -198,7 +198,7 @@ function Creator.New(Name, Properties: { [string]: any }?, Children: { [number]:
 	return Object
 end
 
-function Creator.SpringMotor(Initial, Instance, Prop, IgnoreDialogCheck, ResetOnThemeChange)
+function Creator.SpringMotor(Initial: any, Instance: Object, Prop: string, IgnoreDialogCheck: boolean?, ResetOnThemeChange: boolean?)
 	IgnoreDialogCheck = IgnoreDialogCheck or false
 	ResetOnThemeChange = ResetOnThemeChange or false
 	local Motor = Flipper.SingleMotor.new(Initial)

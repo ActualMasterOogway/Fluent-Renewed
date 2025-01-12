@@ -346,7 +346,12 @@ return function(Config)
 				Duration = 6
 			})
 		end
-
+		if Library.Utilities:GetOS() == "Mobile" then
+			local Icon = Config.Mobile.GetIcon(Window.Minimized)
+			Window.HideButton.Image = Icon.Image
+			Window.HideButton.ImageRectOffset = Icon.ImageRectOffset
+			Window.HideButton.ImageRectSize = Icon.ImageRectSiz
+		end
 		Window.PostMinimized:Fire(tick(), Window.Root.Visible)
 	end
 

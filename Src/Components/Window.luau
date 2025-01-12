@@ -379,7 +379,7 @@ return function(Config)
 		then
 			IsDraggingHideButton = true
 			DragStart = Input.Position
-			StartPos = Window.Root.Position
+			DragStartPos = Window.Root.Position
 
 			Input.Changed:Connect(function()
 				if Input.UserInputState == Enum.UserInputState.End then
@@ -401,7 +401,7 @@ return function(Config)
 	Creator.AddSignal(UserInputService.InputChanged, function(Input)
 		if Input == DragInputHideButton and IsDraggingHideButton then
 		        local delta = Input.Position - DragStart
-			Window.HideButton.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
+			Window.HideButton.Position = UDim2.new(DragStartPos.X.Scale, DragStartPos.X.Offset + delta.X, DragStartPos.Y.Scale, DragStartPos.Y.Offset + delta.Y)
 		end
 	end)
 

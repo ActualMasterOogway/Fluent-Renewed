@@ -377,7 +377,7 @@ return function(Config)
 	end)
 
 	Creator.AddSignal(Window.HideButton.InputBegan, function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			IsDraggingHideButton = true
 			DragStart = Input.Position
 			StartPos = Window.HideButton.Position

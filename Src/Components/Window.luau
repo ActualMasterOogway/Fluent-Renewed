@@ -43,7 +43,7 @@ return function(Config)
 	local Dragging, DragInput, MousePos, StartPos = false
 	local Resizing, ResizePos = false
 	local MinimizeNotif = false
-	local IsDraggingHideButton, DragInput, DragStart, DragStartPos = false
+	local IsDraggingHideButton, DragInputHideButton, DragStart, DragStartPos = false
 
 	Window.AcrylicPaint = Acrylic.AcrylicPaint()
 	Window.TabWidth = Config.TabWidth
@@ -298,8 +298,9 @@ return function(Config)
 			end
 		end
 
-		if Input.UserInputType == Enum.UserInputType.MouseMovement and IsDraggingHideButton then
-			DragInput = Input
+		if Input == DragInputHideButton and IsDraggingHideButton then
+		        local delta = input.Position - dragStart
+			Window.HideButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 		end
 
 		if
@@ -377,25 +378,28 @@ return function(Config)
 	end)
 
 	Creator.AddSignal(Window.HideButton.InputBegan, function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		if
+			Input.UserInputType == Enum.UserInputType.MouseButton1
+			or Input.UserInputType == Enum.UserInputType.Touch
+		then
 			IsDraggingHideButton = true
 			DragStart = Input.Position
-			StartPos = Window.HideButton.Position
+			StartPos = Window.Root.Position
 
-			local DragThread = task.spawn(function()
-				while Library.Loaded and IsDraggingHideButton and DragInput and task.wait() do
-					local delta = DragInput.Position - DragStart
-					Window.HideButton.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
-				end
-			end)
-
-			local InputEnded; InputEnded = Input.Changed:Connect(function()
+			Input.Changed:Connect(function()
 				if Input.UserInputState == Enum.UserInputState.End then
-					IsDraggingHideButton = false
-					task.cancel(DragThread)
-					InputEnded:Disconnect()
+					Dragging = false
 				end
 			end)
+		end
+	end)
+
+	Creator.AddSignal(Window.HideButton.InputChanged, function(Input)
+		if
+			Input.UserInputType == Enum.UserInputType.MouseMovement
+			or Input.UserInputType == Enum.UserInputType.Touch
+		then
+			DragInputHideButton = Input
 		end
 	end)
 

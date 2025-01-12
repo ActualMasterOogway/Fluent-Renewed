@@ -347,14 +347,6 @@ return function(Config)
 			})
 		end
 
-		if Library.Utilities:GetOS() == "Mobile" then
-			local Icon = Config.Mobile.GetIcon(Window.Minimized)
-
-			Window.HideButton.Image = Icon.Image
-			Window.HideButton.ImageRectOffset = Icon.ImageRectOffset
-			Window.HideButton.ImageRectSize = Icon.ImageRectSize
-		end
-
 		Window.PostMinimized:Fire(tick(), Window.Root.Visible)
 	end
 
@@ -409,6 +401,10 @@ return function(Config)
 		Creator.AddSignal(Window.HideButton.TouchTap, function()
 			Window.Minimized = not Window.Minimized
        			Window.Root.Visible = not Window.Minimized
+			local Icon = Config.Mobile.GetIcon(Window.Minimized)
+			Window.HideButton.Image = Icon.Image
+			Window.HideButton.ImageRectOffset = Icon.ImageRectOffset
+			Window.HideButton.ImageRectSize = Icon.ImageRectSize
 		end)
 	else
 		Creator.AddSignal(Window.HideButton.MouseButton1Click, function()

@@ -379,7 +379,7 @@ return function(Config)
 		then
 			IsDraggingHideButton = true
 			DragStart = Input.Position
-			DragStartPos = Window.Root.Position
+			DragStartPos = Window.HideButton.Position
 
 			Input.Changed:Connect(function()
 				if Input.UserInputState == Enum.UserInputState.End then

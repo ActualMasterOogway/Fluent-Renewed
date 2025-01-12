@@ -401,11 +401,13 @@ return function(Config)
 
 	if Library.Utilities:GetOS() == "Mobile" then
 		Creator.AddSignal(Window.HideButton.TouchTap, function()
-			Window:Minimize()
+			Window.Minimized = not Window.Minimized
+       			Window.Root.Visible = not Window.Minimized
 		end)
 	else
 		Creator.AddSignal(Window.HideButton.MouseButton1Click, function()
-			Window:Minimize()
+			Window.Minimized = not Window.Minimized
+       			Window.Root.Visible = not Window.Minimized
 		end)	
 	end
 

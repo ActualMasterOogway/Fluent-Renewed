@@ -298,11 +298,6 @@ return function(Config)
 			end
 		end
 
-		if Input == DragInputHideButton and IsDraggingHideButton then
-		        local delta = input.Position - dragStart
-			Window.HideButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		end
-
 		if
 			(Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch)
 			and Resizing
@@ -388,9 +383,16 @@ return function(Config)
 
 			Input.Changed:Connect(function()
 				if Input.UserInputState == Enum.UserInputState.End then
-					Dragging = false
+					IsDraggingHideButton = false
 				end
 			end)
+		end
+	end)
+
+	Creator.AddSignal(UserInputService.InputChanged, function(Input)
+		if Input == DragInputHideButton and IsDraggingHideButton then
+		        local delta = input.Position - DragStart
+			Window.HideButton.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
 		end
 	end)
 

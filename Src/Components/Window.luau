@@ -389,19 +389,19 @@ return function(Config)
 		end
 	end)
 
-	Creator.AddSignal(UserInputService.InputChanged, function(Input)
-		if Input == DragInputHideButton and IsDraggingHideButton then
-		        local delta = input.Position - DragStart
-			Window.HideButton.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
-		end
-	end)
-
 	Creator.AddSignal(Window.HideButton.InputChanged, function(Input)
 		if
 			Input.UserInputType == Enum.UserInputType.MouseMovement
 			or Input.UserInputType == Enum.UserInputType.Touch
 		then
 			DragInputHideButton = Input
+		end
+	end)
+
+	Creator.AddSignal(UserInputService.InputChanged, function(Input)
+		if Input == DragInputHideButton and IsDraggingHideButton then
+		        local delta = Input.Position - DragStart
+			Window.HideButton.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
 		end
 	end)
 

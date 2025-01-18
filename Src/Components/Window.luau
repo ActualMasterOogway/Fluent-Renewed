@@ -43,7 +43,7 @@ return function(Config)
 	local Dragging, DragInput, MousePos, StartPos = false
 	local Resizing, ResizePos = false
 	local MinimizeNotif = false
-	local IsDraggingHideButton, DragInput, DragStart, DragStartPos = false
+	local IsDraggingHideButton, DragInputHideButton, DragStart, DragStartPos = false
 
 	Window.AcrylicPaint = Acrylic.AcrylicPaint()
 	Window.TabWidth = Config.TabWidth
@@ -298,10 +298,6 @@ return function(Config)
 			end
 		end
 
-		if Input.UserInputType == Enum.UserInputType.MouseMovement and IsDraggingHideButton then
-			DragInput = Input
-		end
-
 		if
 			(Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch)
 			and Resizing
@@ -350,15 +346,12 @@ return function(Config)
 				Duration = 6
 			})
 		end
-
 		if Library.Utilities:GetOS() == "Mobile" then
 			local Icon = Config.Mobile.GetIcon(Window.Minimized)
-
 			Window.HideButton.Image = Icon.Image
 			Window.HideButton.ImageRectOffset = Icon.ImageRectOffset
-			Window.HideButton.ImageRectSize = Icon.ImageRectSize
+			Window.HideButton.ImageRectSize = Icon.ImageRectSiz
 		end
-
 		Window.PostMinimized:Fire(tick(), Window.Root.Visible)
 	end
 
@@ -377,35 +370,51 @@ return function(Config)
 	end)
 
 	Creator.AddSignal(Window.HideButton.InputBegan, function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if
+			Input.UserInputType == Enum.UserInputType.MouseButton1
+			or Input.UserInputType == Enum.UserInputType.Touch
+		then
 			IsDraggingHideButton = true
 			DragStart = Input.Position
-			StartPos = Window.HideButton.Position
+			DragStartPos = Window.HideButton.Position
 
-			local DragThread = task.spawn(function()
-				while Library.Loaded and IsDraggingHideButton and DragInput and task.wait() do
-					local delta = DragInput.Position - DragStart
-					Window.HideButton.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
-				end
-			end)
-
-			local InputEnded; InputEnded = Input.Changed:Connect(function()
+			Input.Changed:Connect(function()
 				if Input.UserInputState == Enum.UserInputState.End then
 					IsDraggingHideButton = false
-					task.cancel(DragThread)
-					InputEnded:Disconnect()
 				end
 			end)
 		end
 	end)
 
+	Creator.AddSignal(Window.HideButton.InputChanged, function(Input)
+		if
+			Input.UserInputType == Enum.UserInputType.MouseMovement
+			or Input.UserInputType == Enum.UserInputType.Touch
+		then
+			DragInputHideButton = Input
+		end
+	end)
+
+	Creator.AddSignal(UserInputService.InputChanged, function(Input)
+		if Input == DragInputHideButton and IsDraggingHideButton then
+		        local delta = Input.Position - DragStart
+			Window.HideButton.Position = UDim2.new(DragStartPos.X.Scale, DragStartPos.X.Offset + delta.X, DragStartPos.Y.Scale, DragStartPos.Y.Offset + delta.Y)
+		end
+	end)
+
 	if Library.Utilities:GetOS() == "Mobile" then
 		Creator.AddSignal(Window.HideButton.TouchTap, function()
-			Window:Minimize()
+			Window.Minimized = not Window.Minimized
+       			Window.Root.Visible = not Window.Minimized
+			local Icon = Config.Mobile.GetIcon(Window.Minimized)
+			Window.HideButton.Image = Icon.Image
+			Window.HideButton.ImageRectOffset = Icon.ImageRectOffset
+			Window.HideButton.ImageRectSize = Icon.ImageRectSize
 		end)
 	else
 		Creator.AddSignal(Window.HideButton.MouseButton1Click, function()
-			Window:Minimize()
+			Window.Minimized = not Window.Minimized
+       			Window.Root.Visible = not Window.Minimized
 		end)	
 	end
 

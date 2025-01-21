@@ -350,7 +350,7 @@ return function(Config)
 			local Icon = Config.Mobile.GetIcon(Window.Minimized)
 			Window.HideButton.Image = Icon.Image
 			Window.HideButton.ImageRectOffset = Icon.ImageRectOffset
-			Window.HideButton.ImageRectSize = Icon.ImageRectSiz
+			Window.HideButton.ImageRectSize = Icon.ImageRectSize
 		end
 		Window.PostMinimized:Fire(tick(), Window.Root.Visible)
 	end

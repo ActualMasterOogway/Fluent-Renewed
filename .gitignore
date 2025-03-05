@@ -5,3 +5,4 @@ wally.lock
 
 .vscode/*.d.luau
 Assets/Fonts/Touche
+.DS_Store

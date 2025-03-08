@@ -440,9 +440,16 @@ function Element:New(Idx, Config)
 						if Config.Multi then
 							Selected = Try
 							Dropdown.Value[Value] = Selected and true or nil
+
+							if typeof(Dropdown.Callback) == "function" then
+								Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
+							end
+							if typeof(Dropdown.Changed) == "function" then
+								Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
+							end
 						else
 							Selected = Try
-							Dropdown.Value = Selected and Value or nil
+							Dropdown:SetValue(Selected and Value or nil)
 
 							for _, OtherButton in next, Buttons do
 								OtherButton:UpdateButton()
@@ -451,13 +458,6 @@ function Element:New(Idx, Config)
 
 						Table:UpdateButton()
 						Dropdown:Display()
-
-						if typeof(Dropdown.Callback) == "function" then
-							Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
-						end
-						if typeof(Dropdown.Changed) == "function" then
-							Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
-						end
 					end
 				end
 			end)

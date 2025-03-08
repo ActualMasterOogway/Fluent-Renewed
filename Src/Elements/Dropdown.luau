@@ -451,13 +451,6 @@ function Element:New(Idx, Config)
 
 						Table:UpdateButton()
 						Dropdown:Display()
-
-						if typeof(Dropdown.Callback) == "function" then
-							Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
-						end
-						if typeof(Dropdown.Changed) == "function" then
-							Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
-						end
 					end
 				end
 			end)

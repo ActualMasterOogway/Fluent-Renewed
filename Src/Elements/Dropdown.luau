@@ -233,7 +233,7 @@ function Element:New(Idx, Config)
 	local ListSizeX = 0
 	local function RecalculateListSize()
 		local Subtract = Dropdown.Searchable and 42 or 0
-		local Add = (Dropdown.Searchable and SearchBox.Text ~= "") and 35 or 0
+		local Add = Dropdown.Searchable and 35 or 0
 
 		DropdownHolderCanvas.Size = UDim2.fromOffset(ListSizeX, math.min(392 - Subtract, DropdownListLayout.AbsoluteContentSize.Y + 10 + Add))
 	end

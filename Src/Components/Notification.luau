@@ -1,4 +1,5 @@
 local Root = script.Parent.Parent
+
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Modules.Creator)
 local Acrylic = require(Root.Modules.Acrylic)
@@ -6,6 +7,8 @@ local Acrylic = require(Root.Modules.Acrylic)
 local Spring = Flipper.Spring.new
 local Instant = Flipper.Instant.new
 local New = Creator.New
+
+local SoundService = game:GetService("SoundService")
 
 local Notification = {}
 
@@ -36,6 +39,10 @@ function Notification:New(Config)
 	Config.SubContent = Config.SubContent or ""
 	Config.Duration = Config.Duration or nil
 	Config.Buttons = Config.Buttons or {}
+	Config.Sound = Config.Sound or {}
+
+	Config.Sound.Parent = SoundService
+	Config.Sound.PlayOnRemove = true
 
 	NewNotification.AcrylicPaint = Acrylic.AcrylicPaint()
 
@@ -166,6 +173,17 @@ function Notification:New(Config)
 	function NewNotification:Open()
 		local ContentSize = NewNotification.LabelHolder.AbsoluteSize.Y
 		NewNotification.Holder.Size = UDim2.new(1, 0, 0, 58 + ContentSize)
+
+		if Config.Sound.SoundId then
+			NewNotification.Sound = New("Sound", Config.Sound)
+
+			if not NewNotification.Sound.IsLoaded then
+				NewNotification.Sound.Loaded:Wait()
+			end
+
+			NewNotification.Sound:Destroy()
+			NewNotification.Sound = nil
+		end
 
 		RootMotor:setGoal({
 			Scale = Spring(0, { frequency = 5 }),

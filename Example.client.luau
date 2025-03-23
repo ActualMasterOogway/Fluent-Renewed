@@ -1,7 +1,7 @@
-local Main = require(game:GetService("ReplicatedStorage"):WaitForChild("Fluent"):WaitForChild("MainModule"))
+local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Fluent"):WaitForChild("MainModule"))
 
-local Window = Main:Window{
-    Title = `Fluent {Main.Version}`,
+local Window = Library:Window{
+    Title = `Fluent {Library.Version}`,
     SubTitle = "by Actual Master Oogway",
     TabWidth = 160,
     Size = UDim2.fromOffset(830, 525),
@@ -163,10 +163,11 @@ local MultiTableDropdown = Tabs.Main:Dropdown("MultiInstanceDropdown", {
     Default = {}
 })
 
-local AutoDeselectDropdown = Tabs.Main:Dropdown("Dropdown", {
+local SearchableDropdown = Tabs.Main:Dropdown("SearchingDropdown", {
     Title = "Dropdown",
     Values = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen"},
     Multi = false,
+    Searchable = true,
     Default = 1,
     AutoDeselect = true,
     Callback = function(Value)
@@ -227,7 +228,7 @@ local InputLostFocus = Tabs.Main:Input("InputFocusLost", {
 })
 
 Toggle:OnChanged(function()
-    print("Toggle changed:", Main.Options["Toggle"].Value)
+    print("Toggle changed:", Library.Options["Toggle"].Value)
 end)
 
 Slider:OnChanged(function(Value)
@@ -336,7 +337,7 @@ task.spawn(function()
         if state then
             print("Keybind is being held down")
         end
-        if Main.Unloaded then break end
+        if Library.Unloaded then break end
     end
 end)
 
@@ -345,20 +346,20 @@ local InterfaceSection = Tabs.Settings:Section("Interface")
 InterfaceSection:Dropdown("InterfaceTheme", {
     Title = "Theme",
     Description = "Changes the interface theme.",
-    Values = Main.Themes,
-    Default = Main.Theme,
+    Values = Library.Themes,
+    Default = Library.Theme,
     Callback = function(Value)
-        Main:SetTheme(Value)
+        Library:SetTheme(Value)
     end
 })
 
-if Main.UseAcrylic then
+if Library.UseAcrylic then
     InterfaceSection:Toggle("AcrylicToggle", {
         Title = "Acrylic",
         Description = "The blurred background requires graphic quality 8+",
-        Default = Main.Acrylic,
+        Default = Library.Acrylic,
         Callback = function(Value)
-            Main:ToggleAcrylic(Value)
+            Library:ToggleAcrylic(Value)
         end
     })
 end
@@ -366,25 +367,28 @@ end
 InterfaceSection:Toggle("TransparentToggle", {
     Title = "Transparency",
     Description = "Makes the interface transparent.",
-    Default = Main.Transparency,
+    Default = Library.Transparency,
     Callback = function(Value)
-        Main:ToggleTransparency(Value)
+        Library:ToggleTransparency(Value)
     end
 })
 
 InterfaceSection:Keybind("MenuKeybind", {
     Title = "Minimize Bind", 
-    Default = Main.MinimizeKey or Enum.KeyCode.RightShift,
+    Default = Library.MinimizeKey or Enum.KeyCode.RightShift,
     ChangedCallback = function(Value)
-        Main.MinimizeKey = Value
+        Library.MinimizeKey = Value
     end
 })
-Main.MinimizeKeybind = Main.Options.MenuKeybind
+Library.MinimizeKeybind = Library.Options.MenuKeybind
 
 Window:SelectTab(1)
 
-Main:Notify({
+Library:Notify({
     Title = "Fluent",
     Content = "The script has been loaded.",
-    Duration = 8
+    Duration = 8,
+    Sound = {
+        SoundId = "rbxassetid://8486683243"
+    }
 })

@@ -41,7 +41,7 @@ function TabModule:New(Title, Icon, Parent)
 		Type = "Tab",
 	}
 
-	Icon = Library.Utilities:GetIcon(Icon)
+	Icon = Icon:find("^rbxasset[://|id://]") == nil and Library.Utilities:GetIcon(Icon) or Icon
 
 	Tab.Frame = New("TextButton", {
 		Size = UDim2.new(1, 0, 0, 34),

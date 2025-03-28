@@ -1,5 +1,13 @@
 local httpService = game:GetService("HttpService")
 
+local function TableEqual(Table, Reflect)
+	for Index, Value in Table do 
+		if Reflect[Index] ~= Value then return false end 
+	end 
+
+	return true
+end 
+
 local SaveManager = {} do
 	SaveManager.Folder = "FluentSettings"
 	SaveManager.Ignore = {}
@@ -30,8 +38,17 @@ local SaveManager = {} do
 				return { type = "Dropdown", idx = idx, value = object.Value, mutli = object.Multi, Timestamp = object.Instance.CreatedAt }
 			end,
 			Load = function(idx, data)
-				if SaveManager.Options[idx] then 
-					SaveManager.Options[idx]:SetValue(data.value)
+				local DropdownElement = SaveManager.Options[idx];
+				if DropdownElement then 
+					local HasDisplayer = DropdownElement.Displayer;
+
+					if HasDisplayer then 
+						for _, Value in DropdownElement.Values do 
+							if TableEqual(data.value, Value) then DropdownElement:SetValue(Value) break end 
+						end
+					else 
+						DropdownElement:SetValue(data.value)
+					end 
 				end
 			end,
 		},
@@ -114,7 +131,7 @@ local SaveManager = {} do
 		if (not name) then
 			return false, "No config file is selected"
 		end
-		
+
 		local file = `{self.Folder}/settings/{name}.json`
 		if not isfile(file) then return false, "invalid file" end
 
@@ -178,13 +195,13 @@ local SaveManager = {} do
 				end
 			end
 		end
-		
+
 		return out
 	end
 
 	function SaveManager:SetLibrary(library)
 		self.Library = library
-        self.Options = library.Options
+		self.Options = library.Options
 	end
 
 	function SaveManager:LoadAutoloadConfig()
@@ -221,28 +238,28 @@ local SaveManager = {} do
 		section:AddDropdown("SaveManager_ConfigList", { Title = "Config list", Values = self:RefreshConfigList(), AllowNull = true })
 
 		section:AddButton({
-            Title = "Create config",
-            Callback = function()
-                local name = SaveManager.Options.SaveManager_ConfigName.Value
+			Title = "Create config",
+			Callback = function()
+				local name = SaveManager.Options.SaveManager_ConfigName.Value
 
-                if name:gsub(" ", "") == "" then 
-                    return self.Library:Notify({
+				if name:gsub(" ", "") == "" then 
+					return self.Library:Notify({
 						Title = "Interface",
 						Content = "Config loader",
 						SubContent = "Invalid config name (empty)",
 						Duration = 7
 					})
-                end
+				end
 
-                local success, err = self:Save(name)
-                if not success then
-                    return self.Library:Notify({
+				local success, err = self:Save(name)
+				if not success then
+					return self.Library:Notify({
 						Title = "Interface",
 						Content = "Config loader",
 						SubContent = "Failed to save config: " .. err,
 						Duration = 7
 					})
-                end
+				end
 
 				self.Library:Notify({
 					Title = "Interface",
@@ -251,14 +268,14 @@ local SaveManager = {} do
 					Duration = 7
 				})
 
-                SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
-                SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
+				SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+				SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
 
 				return nil
-            end
-        })
+			end
+		})
 
-        section:AddButton({Title = "Load config", Callback = function()
+		section:AddButton({Title = "Load config", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Load(name)

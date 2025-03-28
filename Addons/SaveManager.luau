@@ -44,7 +44,7 @@ local SaveManager = {} do
 
 					if HasDisplayer then 
 						for _, Value in DropdownElement.Values do 
-							if TableEqual(data.value, Value) then DropdownElement:SetValue(Value) break end 
+							if (typeof(Value) == 'table' and TableEqual(data.value, Value)) then DropdownElement:SetValue(Value) break end 
 						end
 					else 
 						DropdownElement:SetValue(data.value)

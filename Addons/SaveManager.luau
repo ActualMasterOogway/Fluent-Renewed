@@ -1,12 +1,59 @@
 local httpService = game:GetService("HttpService")
 
+
+type Dropdown = {Value: any, Values: {i: any}, Multi: boolean, Displayer: (v) -> (n)?, SetValue: (any) -> ()}
+
+local function IsGenericDisplayer(Displayer)
+	local Success, Result = pcall(debug.getupvalues, Displayer, 1); 
+	
+	if Success == true and #Result == 1 and Result[1].SafeCallback then
+		return true
+	end
+	
+	return false
+end
+
+local DisplayerParser = {
+	Encode = function(Value)
+		local Encoded = {};
+
+		for Val: any, Bool: boolean in Value do
+			table.insert(Encoded, Val)
+		end
+
+		return Encoded
+	end,
+}
+
 local function TableEqual(Table, Reflect)
 	for Index, Value in Table do 
 		if Reflect[Index] ~= Value then return false end 
 	end 
 
 	return true
-end 
+end  
+
+local function SetDisplayerDropdownValue(Dropdown: Dropdown, Value)
+	if Dropdown.Multi then
+		local Values = {}; 
+		
+		for _, DataValue in Value do 
+			for _, DropdownValue in Dropdown.Values do 
+				if typeof(DropdownValue) ~= 'table' or not TableEqual(DataValue, DropdownValue) then continue end 
+				
+				Values[DropdownValue] = true; break
+			end
+		end
+		
+		Dropdown:SetValue(Values)
+	else
+		for _, DropdownValue in Dropdown.Values do 
+			if typeof(DropdownValue) ~= 'table' or not TableEqual(Value, DropdownValue) then continue end 
+			
+			Dropdown:SetValue(DropdownValue); break
+		end	
+	end
+end
 
 local SaveManager = {} do
 	SaveManager.Folder = "FluentSettings"
@@ -35,21 +82,23 @@ local SaveManager = {} do
 		},
 		Dropdown = {
 			Save = function(idx, object)
-				return { type = "Dropdown", idx = idx, value = object.Value, mutli = object.Multi, Timestamp = object.Instance.CreatedAt }
+				local HasDisplayer = not IsGenericDisplayer(object.Displayer);
+				
+				return { type = "Dropdown", idx = idx, value = (HasDisplayer and object.Multi and DisplayerParser.Encode(object.Value) or object.Value), mutli = object.Multi, Timestamp = object.Instance.CreatedAt, displayer = HasDisplayer}
 			end,
 			Load = function(idx, data)
+				if data.value == nil then return end
+				
 				local DropdownElement = SaveManager.Options[idx];
-				if DropdownElement then 
-					local HasDisplayer = DropdownElement.Displayer;
-
-					if HasDisplayer then 
-						for _, Value in DropdownElement.Values do 
-							if (typeof(Value) == 'table' and TableEqual(data.value, Value)) then DropdownElement:SetValue(Value) break end 
-						end
-					else 
-						DropdownElement:SetValue(data.value)
-					end 
+				if not DropdownElement then return end
+				
+				local Value = data.value 
+				if typeof(Value) ~= 'table' or (not data.displayer) then
+					DropdownElement:SetValue(Value)
+					return
 				end
+				
+				SetDisplayerDropdownValue(DropdownElement, Value)
 			end,
 		},
 		Colorpicker = {
@@ -140,7 +189,7 @@ local SaveManager = {} do
 
 		for _, option in next, decoded.objects do
 			if self.Parser[option.type] then
-				task.spawn(self.Parser[option.type].Load, option.idx, option) -- task.spawn() so the config loading wont get stuck.
+				task.spawn(self.Library.SafeCallback, self.Library, self.Parser[option.type].Load, option.idx, option)
 			end
 		end
 

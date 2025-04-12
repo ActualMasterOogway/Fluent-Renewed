@@ -32,9 +32,10 @@ function Element:New(Idx, Config)
 		Searchable = Config.Searchable or false,
 		FocusSearch = Config.FocusSearch or true,
 		SearchPlaceholder = Config.SearchPlaceholder or "Search...",
-		Displayer = Config.Displayer or function(Value)
+		Displayer = typeof(Config.Displayer) == "function" and Config.Displayer or function(Value)
 			return typeof(Value) ~= "number" and tostring(Library.Utilities:Prettify(Value)) or Value
 		end,
+		CustomDisplayer = typeof(Config.Displayer) == "function" and Config.Displayer,
 		Buttons = {},
 		Opened = false,
 		Type = "Dropdown",

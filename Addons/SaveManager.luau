@@ -1,5 +1,50 @@
 local httpService = game:GetService("HttpService")
 
+
+type Dropdown = {Value: any, Values: {i: any}, Multi: boolean, Displayer: (v) -> (n)?, SetValue: (any) -> ()}
+
+local DisplayerParser = {
+	Encode = function(Value)
+		local Encoded = {};
+
+		for Val: any, Bool: boolean in Value do
+			table.insert(Encoded, Val)
+		end
+
+		return Encoded
+	end,
+}
+
+local function TableEqual(Table, Reflect)
+	for Index, Value in Table do 
+		if Reflect[Index] ~= Value then return false end 
+	end 
+
+	return true
+end  
+
+local function SetDisplayerDropdownValue(Dropdown: Dropdown, Value)
+	if Dropdown.Multi then
+		local Values = {}; 
+		
+		for _, DataValue in Value do 
+			for _, DropdownValue in Dropdown.Values do 
+				if typeof(DropdownValue) ~= 'table' or not TableEqual(DataValue, DropdownValue) then continue end 
+				
+				Values[DropdownValue] = true; break
+			end
+		end
+		
+		Dropdown:SetValue(Values)
+	else
+		for _, DropdownValue in Dropdown.Values do 
+			if typeof(DropdownValue) ~= 'table' or not TableEqual(Value, DropdownValue) then continue end 
+			
+			Dropdown:SetValue(DropdownValue); break
+		end	
+	end
+end
+
 local SaveManager = {} do
 	SaveManager.Folder = "FluentSettings"
 	SaveManager.Ignore = {}
@@ -27,12 +72,23 @@ local SaveManager = {} do
 		},
 		Dropdown = {
 			Save = function(idx, object)
-				return { type = "Dropdown", idx = idx, value = object.Value, mutli = object.Multi, Timestamp = object.Instance.CreatedAt }
+				local HasDisplayer = object.CustomDisplayer
+				
+				return { type = "Dropdown", idx = idx, value = (HasDisplayer and object.Multi and DisplayerParser.Encode(object.Value) or object.Value), mutli = object.Multi, Timestamp = object.Instance.CreatedAt, displayer = HasDisplayer}
 			end,
 			Load = function(idx, data)
-				if SaveManager.Options[idx] then 
-					SaveManager.Options[idx]:SetValue(data.value)
+				if data.value == nil then return end
+				
+				local DropdownElement = SaveManager.Options[idx];
+				if not DropdownElement then return end
+				
+				local Value = data.value 
+				if typeof(Value) ~= 'table' or (not data.displayer) then
+					DropdownElement:SetValue(Value)
+					return
 				end
+				
+				SetDisplayerDropdownValue(DropdownElement, Value)
 			end,
 		},
 		Colorpicker = {
@@ -114,7 +170,7 @@ local SaveManager = {} do
 		if (not name) then
 			return false, "No config file is selected"
 		end
-		
+
 		local file = `{self.Folder}/settings/{name}.json`
 		if not isfile(file) then return false, "invalid file" end
 
@@ -123,7 +179,7 @@ local SaveManager = {} do
 
 		for _, option in next, decoded.objects do
 			if self.Parser[option.type] then
-				task.spawn(self.Parser[option.type].Load, option.idx, option) -- task.spawn() so the config loading wont get stuck.
+				task.spawn(self.Library.SafeCallback, self.Library, self.Parser[option.type].Load, option.idx, option)
 			end
 		end
 
@@ -178,13 +234,13 @@ local SaveManager = {} do
 				end
 			end
 		end
-		
+
 		return out
 	end
 
 	function SaveManager:SetLibrary(library)
 		self.Library = library
-        self.Options = library.Options
+		self.Options = library.Options
 	end
 
 	function SaveManager:LoadAutoloadConfig()
@@ -221,28 +277,28 @@ local SaveManager = {} do
 		section:AddDropdown("SaveManager_ConfigList", { Title = "Config list", Values = self:RefreshConfigList(), AllowNull = true })
 
 		section:AddButton({
-            Title = "Create config",
-            Callback = function()
-                local name = SaveManager.Options.SaveManager_ConfigName.Value
+			Title = "Create config",
+			Callback = function()
+				local name = SaveManager.Options.SaveManager_ConfigName.Value
 
-                if name:gsub(" ", "") == "" then 
-                    return self.Library:Notify({
+				if name:gsub(" ", "") == "" then 
+					return self.Library:Notify({
 						Title = "Interface",
 						Content = "Config loader",
 						SubContent = "Invalid config name (empty)",
 						Duration = 7
 					})
-                end
+				end
 
-                local success, err = self:Save(name)
-                if not success then
-                    return self.Library:Notify({
+				local success, err = self:Save(name)
+				if not success then
+					return self.Library:Notify({
 						Title = "Interface",
 						Content = "Config loader",
 						SubContent = "Failed to save config: " .. err,
 						Duration = 7
 					})
-                end
+				end
 
 				self.Library:Notify({
 					Title = "Interface",
@@ -251,14 +307,14 @@ local SaveManager = {} do
 					Duration = 7
 				})
 
-                SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
-                SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
+				SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+				SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
 
 				return nil
-            end
-        })
+			end
+		})
 
-        section:AddButton({Title = "Load config", Callback = function()
+		section:AddButton({Title = "Load config", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Load(name)

@@ -3,16 +3,6 @@ local httpService = game:GetService("HttpService")
 
 type Dropdown = {Value: any, Values: {i: any}, Multi: boolean, Displayer: (v) -> (n)?, SetValue: (any) -> ()}
 
-local function IsGenericDisplayer(Displayer)
-	local Success, Result = pcall(debug.getupvalues, Displayer, 1); 
-	
-	if Success == true and #Result == 1 and Result[1].SafeCallback then
-		return true
-	end
-	
-	return false
-end
-
 local DisplayerParser = {
 	Encode = function(Value)
 		local Encoded = {};
@@ -82,7 +72,7 @@ local SaveManager = {} do
 		},
 		Dropdown = {
 			Save = function(idx, object)
-				local HasDisplayer = not IsGenericDisplayer(object.Displayer);
+				local HasDisplayer = object.CustomDisplayer
 				
 				return { type = "Dropdown", idx = idx, value = (HasDisplayer and object.Multi and DisplayerParser.Encode(object.Value) or object.Value), mutli = object.Multi, Timestamp = object.Instance.CreatedAt, displayer = HasDisplayer}
 			end,

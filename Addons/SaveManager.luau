@@ -5,7 +5,7 @@ type Dropdown = {Value: any, Values: {i: any}, Multi: boolean, Displayer: (v) ->
 
 local DisplayerParser = {
 	Encode = function(Value)
-		local Encoded = {};
+		local Encoded = {}
 
 		for Val: any, Bool: boolean in Value do
 			table.insert(Encoded, Val)
@@ -25,13 +25,14 @@ end
 
 local function SetDisplayerDropdownValue(Dropdown: Dropdown, Value)
 	if Dropdown.Multi then
-		local Values = {}; 
+		local Values = {}
 		
 		for _, DataValue in Value do 
 			for _, DropdownValue in Dropdown.Values do 
 				if typeof(DropdownValue) ~= 'table' or not TableEqual(DataValue, DropdownValue) then continue end 
 				
-				Values[DropdownValue] = true; break
+				Values[DropdownValue] = true
+				break
 			end
 		end
 		
@@ -40,7 +41,8 @@ local function SetDisplayerDropdownValue(Dropdown: Dropdown, Value)
 		for _, DropdownValue in Dropdown.Values do 
 			if typeof(DropdownValue) ~= 'table' or not TableEqual(Value, DropdownValue) then continue end 
 			
-			Dropdown:SetValue(DropdownValue); break
+			Dropdown:SetValue(DropdownValue)
+			break
 		end	
 	end
 end
@@ -79,7 +81,7 @@ local SaveManager = {} do
 			Load = function(idx, data)
 				if data.value == nil then return end
 				
-				local DropdownElement = SaveManager.Options[idx];
+				local DropdownElement = SaveManager.Options[idx]
 				if not DropdownElement then return end
 				
 				local Value = data.value 

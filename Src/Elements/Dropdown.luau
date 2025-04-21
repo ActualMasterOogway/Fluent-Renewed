@@ -35,7 +35,7 @@ function Element:New(Idx, Config)
 		Displayer = typeof(Config.Displayer) == "function" and Config.Displayer or function(Value)
 			return typeof(Value) ~= "number" and tostring(Library.Utilities:Prettify(Value)) or Value
 		end,
-		CustomDisplayer = typeof(Config.Displayer) == "function" and Config.Displayer,
+		CustomDisplayer = (typeof(Config.Displayer) == "function" and Config.Displayer and true) or false,
 		Buttons = {},
 		Opened = false,
 		Type = "Dropdown",
